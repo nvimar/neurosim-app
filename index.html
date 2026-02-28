@@ -104,16 +104,12 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 @keyframes spin{to{transform:rotate(360deg)}}
 .gen-loading{display:flex;align-items:center;gap:.8rem;padding:1.5rem;background:var(--secondary);border-radius:var(--radius);font-size:.9rem;color:var(--sec-fg);font-weight:600;margin-top:1rem}
 
-/* Desempeños dinámicos */
-.desempenos-box {background: #f8fffe; border: 1px solid var(--border); border-radius: 8px; padding: 0.8rem; font-size: 0.85rem; color: var(--muted); margin-top:0.4rem;}
-.desempenos-box ul {list-style:none; padding-left:0; margin-top:0.3rem; margin-bottom:0.8rem;}
-.desempenos-box li {margin-bottom:0.4rem;}
-.desempenos-box strong {color: var(--primary);}
-
-/* Tabs & Mobile */
+/* Tabs */
 .tabs{display:flex;gap:.3rem;border-bottom:2px solid var(--border);margin-bottom:1.2rem}
 .tab{padding:.5rem 1rem;font-size:.85rem;font-weight:600;border:none;background:none;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer}
 .tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+
+/* Mobile */
 .menu-toggle{display:none;position:fixed;top:.8rem;left:.8rem;z-index:60;background:var(--primary);color:#fff;border:none;border-radius:8px;width:40px;height:40px;font-size:1.2rem}
 @media(max-width:768px){
   .sidebar{transform:translateX(-100%)}
@@ -200,13 +196,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
         <div id="sesCnebPanel" class="cneb-panel"><div class="cneb-title">📋 Competencias CNEB (haz clic)</div><div id="sesCnebCompetencias"></div></div>
         <div class="form-group"><label>Título de la sesión</label><input id="sesTitulo" placeholder="Ej: Analizamos textos argumentativos"></div>
         <div class="form-group"><label>Competencia seleccionada</label><select id="sesCompetencia" onchange="onCompetenciaChange('ses')"><option value="">-- Selecciona --</option></select></div>
-        
-        <div class="form-group"><label>Capacidades</label><div id="sesCapacidades" style="font-size:0.9rem;">Selecciona un área</div></div>
-        
-        <div class="form-group">
-          <label>Desempeños sugeridos (según capacidades)</label>
-          <div id="sesDesempenos" class="desempenos-box">Selecciona una competencia primero.</div>
-        </div>
+        <div class="form-group"><label>Capacidades</label><div id="sesCapacidades">Selecciona un área</div></div>
         
         <button class="btn btn-primary" id="btnGenSes" onclick="generarSesionIA()" style="width:auto;margin-top:1rem">✨ Generar Sesión con IA</button>
       </div>
@@ -225,7 +215,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
           <div id="uniFileName" class="file-name-label"></div>
         </div>
 
-        <div class="form-group"><label>Área Curricular</label><select id="uniArea" onchange="onAreaChange('uni')"><option>Comunicación</option><option>Matemática</option><option>Ciencia y Tecnología</option></select></div>
+        <div class="form-group"><label>Área Curricular</label><select id="uniArea" onchange="onAreaChange('uni')"><option>Comunicación</option><option>Matemática</option></select></div>
         <div id="uniCnebPanel" class="cneb-panel"><div class="cneb-title">📋 Competencias CNEB</div><div id="uniCnebCompetencias"></div></div>
         <div class="form-group"><label>Título de la Unidad</label><input id="uniTitulo" placeholder="Ej: Comprendemos textos"></div>
         <div class="form-group"><label>Competencias a trabajar</label><textarea id="uniCompetencias" style="min-height:70px"></textarea></div>
@@ -247,7 +237,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
           <div id="planFileName" class="file-name-label"></div>
         </div>
 
-        <div class="form-group"><label>Área Curricular</label><select id="planArea" onchange="onAreaChange('plan')"><option>Comunicación</option><option>Matemática</option><option>Ciencia y Tecnología</option></select></div>
+        <div class="form-group"><label>Área Curricular</label><select id="planArea" onchange="onAreaChange('plan')"><option>Comunicación</option><option>Matemática</option></select></div>
         <div id="planCnebPanel" class="cneb-panel"><div class="cneb-title">📋 Competencias CNEB</div><div id="planCnebCompetencias"></div></div>
         <div class="form-group"><label>Competencias del área</label><textarea id="planCompetencias" style="min-height:70px"></textarea></div>
         
@@ -272,40 +262,164 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 </div>
 
 <script>
-// Base de datos actualizada con capacidades y desempeños (ejemplos clave)
 const areasCNEB = {
   "Comunicación": [
-    { 
-      name: "Se comunica oralmente", 
-      caps: [
-        { name: "Obtiene información del texto oral", des: ["Recupera información explícita de los textos orales que escucha.", "Selecciona datos específicos e integra esta información."] },
-        { name: "Infiere e interpreta información", des: ["Deduce diversas relaciones lógicas entre las ideas del texto oral.", "Explica el tema y el propósito comunicativo del texto."] }
-      ] 
-    },
-    { 
-      name: "Lee diversos tipos de textos", 
-      caps: [
-        { name: "Obtiene información del texto escrito", des: ["Identifica información explícita, relevante y complementaria seleccionando datos específicos.", "Integra información explícita cuando se encuentra en distintas partes del texto."] },
-        { name: "Infiere e interpreta del texto", des: ["Deduce características implícitas de seres, objetos, hechos y lugares.", "Explica el tema, los subtemas y el propósito comunicativo del texto."] }
-      ] 
-    },
-    { 
-      name: "Escribe diversos tipos de textos", 
-      caps: [
-        { name: "Adecúa el texto a la situación", des: ["Adecúa el texto a la situación comunicativa considerando el propósito comunicativo y el destinatario.", "Elige estratégicamente el registro formal o informal."] },
-        { name: "Organiza y desarrolla las ideas", des: ["Escribe textos de forma coherente y cohesionada.", "Ordena las ideas en torno a un tema, las jerarquiza en subtemas e ideas principales."] }
-      ] 
-    }
+    { name: "Se comunica oralmente", caps: ["Obtiene información", "Infiere información"] },
+    { name: "Lee diversos tipos de textos", caps: ["Obtiene información", "Infiere e interpreta"] },
+    { name: "Escribe diversos tipos de textos", caps: ["Adecúa el texto", "Organiza y desarrolla"] }
   ],
   "Matemática": [
-    { 
-      name: "Resuelve problemas de cantidad", 
-      caps: [
-        { name: "Traduce cantidades a expresiones", des: ["Establece relaciones entre datos y acciones de agregar, quitar, igualar.", "Expresa con diversas representaciones y lenguaje numérico su comprensión."] },
-        { name: "Comunica su comprensión", des: ["Expresa el significado de los números racionales y sus operaciones.", "Justifica sus procedimientos matemáticos usando propiedades."] }
-      ] 
-    },
-    { 
-      name: "Resuelve problemas de regularidad", 
-      caps: [
-        { name: "Traduce datos y condiciones", des: ["Establece relaciones entre datos y valores desconocidos.", "Transforma relaciones a expresiones algebraicas que incluyen ecuaciones."]
+    { name: "Resuelve problemas de cantidad", caps: ["Traduce cantidades", "Comunica su comprensión"] },
+    { name: "Resuelve problemas de regularidad", caps: ["Traduce datos", "Comunica comprensión"] }
+  ],
+  "Ciencia y Tecnología": [
+    { name: "Indaga mediante métodos científicos", caps: ["Problematiza situaciones", "Diseña estrategias"] }
+  ]
+};
+
+function enterApp() {
+  document.getElementById('authPage').classList.add('hidden');
+  document.getElementById('appShell').classList.remove('hidden');
+  onAreaChange('ses'); onAreaChange('uni'); onAreaChange('plan');
+}
+
+function logout() {
+  document.getElementById('appShell').classList.add('hidden');
+  document.getElementById('authPage').classList.remove('hidden');
+}
+
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+function showPage(pageId, navEl) {
+  document.querySelectorAll('.main > div').forEach(el => el.classList.add('hidden'));
+  document.getElementById('page-' + pageId).classList.remove('hidden');
+  document.querySelectorAll('.sidebar nav a').forEach(el => el.classList.remove('active'));
+  if (navEl) navEl.classList.add('active');
+  if (window.innerWidth <= 768) toggleSidebar();
+}
+
+function onAreaChange(prefix) {
+  const area = document.getElementById(prefix + 'Area').value;
+  const comps = areasCNEB[area] || [];
+  if (prefix === 'ses') {
+    const sel = document.getElementById('sesCompetencia');
+    sel.innerHTML = '<option value="">-- Selecciona --</option>';
+    comps.forEach((c, i) => { sel.innerHTML += `<option value="${i}">${c.name}</option>`; });
+    document.getElementById('sesCnebCompetencias').innerHTML = comps.map((c, i) => `<span class="cneb-tag" onclick="selectCompetencia(${i})">${c.name}</span>`).join('');
+  } else if (prefix === 'uni') {
+    document.getElementById('uniCnebCompetencias').innerHTML = comps.map(c => `<span class="cneb-tag" onclick="addCompetenciaToTextarea('uniCompetencias', '${c.name}')">${c.name}</span>`).join('');
+  } else if (prefix === 'plan') {
+    document.getElementById('planCnebCompetencias').innerHTML = comps.map(c => `<span class="cneb-tag" onclick="addCompetenciaToTextarea('planCompetencias', '${c.name}')">${c.name}</span>`).join('');
+  }
+}
+
+function selectCompetencia(index) {
+  document.getElementById('sesCompetencia').value = index;
+  onCompetenciaChange('ses');
+}
+
+function addCompetenciaToTextarea(id, compName) {
+  const ta = document.getElementById(id);
+  ta.value = ta.value ? ta.value + '\n- ' + compName : '- ' + compName;
+}
+
+function onCompetenciaChange(prefix) {
+  const area = document.getElementById(prefix + 'Area').value;
+  const compIdx = document.getElementById(prefix + 'Competencia').value;
+  if (compIdx === '') return document.getElementById(prefix + 'Capacidades').innerHTML = '';
+  const caps = areasCNEB[area][compIdx].caps;
+  document.getElementById(prefix + 'Capacidades').innerHTML = caps.map(cap => `<label style="display:block;"><input type="checkbox" checked> ${cap}</label>`).join('');
+}
+
+// ====== LOGICA PARA LEER ARCHIVOS (PLANTILLAS) ======
+function showFileName(input, labelId) {
+  const label = document.getElementById(labelId);
+  if (input.files && input.files.length > 0) {
+    label.textContent = "✅ Archivo cargado: " + input.files[0].name;
+    label.style.display = "block";
+  } else {
+    label.style.display = "none";
+  }
+}
+
+async function readFileText(inputId) {
+  const input = document.getElementById(inputId);
+  if (!input || !input.files || input.files.length === 0) return "";
+  const file = input.files[0];
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.onerror = e => reject(e);
+    reader.readAsText(file); // Lee el contenido del .txt
+  });
+}
+
+// ====== LLAMADAS A LA IA ======
+async function callIA(prompt, outputId) {
+  const output = document.getElementById(outputId);
+  output.innerHTML = '<div class="gen-loading"><div class="loading"></div>Generando contenido...</div>';
+  try {
+    const res = await fetch('/api/generar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    output.innerHTML = `<div class="output-rendered">${data.respuesta}</div>`;
+  } catch (err) {
+    output.innerHTML = `<div class="cneb-panel" style="border-color: red; color: red;">❌ Error al generar.</div>`;
+  }
+}
+
+async function generarSesionIA() {
+  const titulo = document.getElementById('sesTitulo').value || "Tema libre";
+  let templateText = await readFileText('sesFile');
+  let formatInstruccion = templateText ? `\n\nUTILIZA ESTRICTAMENTE ESTE FORMATO PARA TU RESPUESTA:\n${templateText}` : "";
+  const prompt = `Actúa como experto MINEDU. Desarrolla una Sesión de Aprendizaje CNEB. Tema: ${titulo}. ${formatInstruccion}`;
+  await callIA(prompt, 'sesOutput');
+}
+
+async function generarUnidadIA() {
+  const titulo = document.getElementById('uniTitulo').value || "Unidad";
+  let templateText = await readFileText('uniFile');
+  let formatInstruccion = templateText ? `\n\nUTILIZA ESTRICTAMENTE ESTE FORMATO PARA TU RESPUESTA:\n${templateText}` : "";
+  const prompt = `Actúa como experto MINEDU. Desarrolla una Unidad Didáctica CNEB. Tema: ${titulo}. ${formatInstruccion}`;
+  await callIA(prompt, 'uniOutput');
+}
+
+async function generarPlanAnualIA() {
+  const area = document.getElementById('planArea').value;
+  let templateText = await readFileText('planFile');
+  let formatInstruccion = templateText ? `\n\nUTILIZA ESTRICTAMENTE ESTE FORMATO PARA TU RESPUESTA:\n${templateText}` : "";
+  const prompt = `Actúa como experto MINEDU. Desarrolla un Plan Anual CNEB para ${area}. ${formatInstruccion}`;
+  await callIA(prompt, 'planOutput');
+}
+
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  const container = document.getElementById('chatMessages');
+  container.innerHTML += `<div class="chat-msg user"><div class="chat-avatar">👤</div><div class="chat-bubble user-bubble">${text}</div></div>`;
+  input.value = '';
+  container.innerHTML += `<div id="typing" class="chat-msg ai"><div class="chat-avatar">🤖</div><div class="chat-bubble ai-bubble"><div class="loading" style="width:12px;height:12px;border-width:1.5px"></div></div></div>`;
+  container.scrollTop = container.scrollHeight;
+
+  try {
+    const res = await fetch('/api/generar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: `Experto CNEB: ${text}` })
+    });
+    const data = await res.json();
+    document.getElementById('typing').remove();
+    container.innerHTML += `<div class="chat-msg ai"><div class="chat-avatar">🤖</div><div class="chat-bubble ai-bubble">${data.respuesta}</div></div>`;
+  } catch (err) {
+    document.getElementById('typing').remove();
+  }
+  container.scrollTop = container.scrollHeight;
+}
+</script>
+</body>
+</html>
