@@ -83,7 +83,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 .form-group textarea{width:100%;padding:.6rem .8rem;border:1px solid var(--border);border-radius:8px;outline:none;resize:vertical;min-height:80px}
 .form-group textarea:focus{border-color:var(--primary)}
 
-/* Zona de carga de archivos (Mejorada para Drag & Drop) */
+/* Zona de carga de archivos */
 .file-drop{border:2px dashed var(--border);border-radius:var(--radius);padding:1.5rem;text-align:center;color:var(--muted);font-size:.85rem;cursor:pointer;transition:all .2s ease;margin-top:.5rem;background:#faf9f6}
 .file-drop:hover, .file-drop.dragover{border-color:var(--primary);background:var(--secondary);color:var(--sec-fg)}
 .file-drop input{display:none}
@@ -233,13 +233,14 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
             <label>Área Curricular</label>
             <select id="sesArea" onchange="onAreaChange('ses')">
               <option>Comunicación</option><option>Matemática</option><option>Ciencia y Tecnología</option>
-              <option>Ciencias Sociales</option><option>Desarrollo Personal, Ciudadanía y Cívica</option>
+              <option>Ciencias Sociales</option><option>Desarrollo Personal, Ciudadanía y Cívica</option><option>EPT</option>
             </select>
           </div>
           <div class="form-group">
             <label>Grado</label>
             <select id="sesGrado">
               <option>1° Secundaria</option><option>2° Secundaria</option><option>3° Secundaria</option>
+              <option>4° Secundaria</option><option>5° Secundaria</option>
             </select>
           </div>
         </div>
@@ -252,7 +253,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
         <div class="form-group"><label>Título de la sesión</label><input id="sesTitulo" placeholder="Ej: Analizamos textos..."></div>
         <div class="form-group"><label>Competencia</label><select id="sesCompetencia" onchange="onCompetenciaChange('ses')"><option value="">-- Selecciona --</option></select></div>
         <div class="form-group"><label>Capacidades</label><div id="sesCapacidades" style="font-size:.85rem;color:var(--muted);">Selecciona un área y competencia</div></div>
-        <div class="form-group"><label>Desempeño precisado</label><textarea id="sesDesempeno" style="min-height:60px"></textarea></div>
+        <div class="form-group"><label>Desempeño precisado</label><textarea id="sesDesempeno" style="min-height:60px" placeholder="Escribe el desempeño aquí..."></textarea></div>
         
         <div style="margin-top:1rem;display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
           <button class="btn btn-primary" onclick="generarSesionIA()" style="width:auto">✨ Generar Sesión con IA</button>
@@ -346,7 +347,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 </div>
 
 <script>
-// Tus áreas originales
+// Tus áreas originales CNEB (Ejemplo expandido)
 const areasCNEB = {
   "Comunicación": [
     { name: "Se comunica oralmente", caps: ["Obtiene información", "Infiere e interpreta"] },
@@ -358,6 +359,9 @@ const areasCNEB = {
   ],
   "Ciencia y Tecnología": [
     { name: "Indaga mediante métodos científicos", caps: ["Problematiza", "Diseña estrategias"] }
+  ],
+  "EPT": [
+    { name: "Gestiona proyectos de emprendimiento", caps: ["Crea propuestas de valor", "Aplica habilidades técnicas", "Trabaja cooperativamente", "Evalúa resultados"] }
   ]
 };
 
@@ -433,26 +437,47 @@ async function readFileWord(inputId) {
     const reader = new FileReader();
     reader.onload = function(event) {
       mammoth.extractRawText({arrayBuffer: event.target.result})
-        .then(function(result) {
-          resolve(result.value); 
-        })
-        .catch(function(err) {
-          console.error("Error leyendo Word", err);
-          resolve("");
-        });
+        .then(function(result) { resolve(result.value); })
+        .catch(function(err) { resolve(""); });
     };
     reader.readAsArrayBuffer(file);
   });
 }
 
-// ====== LÓGICA PARA EXPORTAR A WORD (.doc) ======
+// ====== LÓGICA PARA EXPORTAR A WORD CON FORMATO MEJORADO ======
 function exportToWord(elementId, filename) {
   const contentEl = document.getElementById(elementId).querySelector('.output-rendered');
   if (!contentEl) return alert("No hay documento generado para exportar.");
 
-  const preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Documento</title></head><body>";
-  const postHtml = "</body></html>";
-  const html = preHtml + contentEl.innerHTML + postHtml;
+  // Limpiar etiquetas "```html" y "```" si la IA las generó por accidente.
+  let rawHTML = contentEl.innerHTML
+      .replace(/```html/gi, '')
+      .replace(/```/g, '')
+      .trim();
+
+  // Inyectar el CSS exacto solicitado para mantener la estructura en Word
+  const styles = `
+    <style>
+      body { font-family: 'Arial', sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; background-color: #ffffff; }
+      h1, h2, h3, h4 { color: #0056b3; margin-top: 25px; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+      h1 { font-size: 2em; text-align: center; border-bottom: 2px solid #0056b3; padding-bottom: 15px; }
+      h2 { font-size: 1.5em; border-bottom: 1px solid #a0cffc; }
+      h3 { font-size: 1.2em; color: #007bff; }
+      table { width: 100%; border-collapse: collapse; margin-bottom: 20px; background-color: #fdfdfd; }
+      table, th, td { border: 1px solid #ddd; }
+      th, td { padding: 10px; text-align: left; vertical-align: top; }
+      th { background-color: #e9f5ff; font-weight: bold; color: #004085; }
+      ul { list-style-type: disc; margin-left: 25px; padding-left: 0; margin-bottom: 15px; }
+      ol { list-style-type: decimal; margin-left: 25px; padding-left: 0; margin-bottom: 15px; }
+      p { margin-bottom: 10px; }
+      .signature-line { margin-top: 50px; text-align: center; display: flex; justify-content: space-around; padding-top: 20px; }
+      .signature-line div { width: 30%; border-top: 1px solid #333; padding-top: 8px; font-size: 0.9em; }
+    </style>
+  `;
+
+  const preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Documento</title>" + styles + "</head><body><div class='container'>";
+  const postHtml = "</div></body></html>";
+  const html = preHtml + rawHTML + postHtml;
 
   const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
   const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
@@ -477,8 +502,6 @@ async function callIA(prompt, outputId, btnExportId) {
   const btnExport = document.getElementById(btnExportId);
   btnExport.style.display = 'none'; 
   output.innerHTML = '<div class="gen-loading"><div class="loading"></div>Generando contenido con IA...</div>';
-  
-  // Desplazamiento suave para ver el loader (UX)
   output.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
   try {
@@ -490,10 +513,10 @@ async function callIA(prompt, outputId, btnExportId) {
     const data = await res.json();
     if (data.error) throw new Error(data.error);
     
-    output.innerHTML = `<div class="output-rendered">${data.respuesta}</div>`;
+    // Limpiamos los bloques de código HTML para evitar basura visual
+    let cleanResponse = data.respuesta.replace(/```html/gi, '').replace(/```/g, '');
+    output.innerHTML = `<div class="output-rendered">${cleanResponse}</div>`;
     btnExport.style.display = 'inline-flex'; 
-    
-    // Desplazamiento suave al resultado generado (UX)
     output.scrollIntoView({ behavior: 'smooth', block: 'start' });
     
   } catch (err) {
@@ -501,21 +524,48 @@ async function callIA(prompt, outputId, btnExportId) {
   }
 }
 
+// Generación con coherencia de variables y CNEB
 async function generarSesionIA() {
   const titulo = document.getElementById('sesTitulo').value || "Tema Libre";
+  const area = document.getElementById('sesArea').value;
+  const grado = document.getElementById('sesGrado').value;
+  const compSelect = document.getElementById('sesCompetencia');
+  const competencia = compSelect.options[compSelect.selectedIndex]?.text || "No especificada";
+  const desempeño = document.getElementById('sesDesempeno').value || "No especificado";
+  
+  // Capturar capacidades marcadas
+  const capNodes = document.querySelectorAll('#sesCapacidades input:checked');
+  let capacidades = Array.from(capNodes).map(n => n.parentNode.textContent.trim()).join(', ') || "No especificadas";
+
   let templateText = await readFileWord('sesFile');
   let formatInstruccion = templateText ? `\n\nADAPTA TU RESPUESTA ESTRICTAMENTE A LOS TÍTULOS Y ESTRUCTURA DE ESTA PLANTILLA:\n${templateText}` : "";
 
-  const prompt = `Actúa como experto MINEDU. Desarrolla Sesión de Aprendizaje. Tema: ${titulo}. Formato HTML.${formatInstruccion}`;
+  // Prompt modificado para ser estricto con HTML y datos CNEB
+  const prompt = `Actúa como experto MINEDU Perú. Desarrolla una Sesión de Aprendizaje detallada.
+Datos a utilizar OBLIGATORIAMENTE:
+- Área Curricular: ${area}
+- Grado: ${grado}
+- Título de Sesión: ${titulo}
+- Competencia: ${competencia}
+- Capacidades: ${capacidades}
+- Desempeño precisado: ${desempeño}
+
+REGLAS:
+1. Mantén estricta coherencia pedagógica entre la competencia, capacidades, desempeño y el tema según el CNEB.
+2. Devuelve SOLO CÓDIGO HTML PURO estructurado. NO incluyas \`\`\`html ni markdown.
+3. Utiliza Tablas HTML (<table>, <tr>, <th>, <td>) para los "Datos Informativos", así como para estructurar la Secuencia Didáctica (Inicio, Desarrollo, Cierre) y la Evaluación.
+${formatInstruccion}`;
+
   await callIA(prompt, 'sesOutput', 'btnExportSes');
 }
 
 async function generarUnidadIA() {
   const titulo = document.getElementById('uniTitulo').value || "Unidad Libre";
+  const area = document.getElementById('uniArea').value;
   let templateText = await readFileWord('uniFile');
   let formatInstruccion = templateText ? `\n\nADAPTA TU RESPUESTA ESTRICTAMENTE A LOS TÍTULOS Y ESTRUCTURA DE ESTA PLANTILLA:\n${templateText}` : "";
 
-  const prompt = `Actúa como experto MINEDU. Desarrolla Unidad Didáctica. Tema: ${titulo}. Formato HTML.${formatInstruccion}`;
+  const prompt = `Actúa como experto MINEDU Perú. Desarrolla Unidad Didáctica. Tema: ${titulo}. Área: ${area}. Devuelve SOLO HTML puro y usa Tablas HTML. ${formatInstruccion}`;
   await callIA(prompt, 'uniOutput', 'btnExportUni');
 }
 
@@ -524,7 +574,7 @@ async function generarPlanAnualIA() {
   let templateText = await readFileWord('planFile');
   let formatInstruccion = templateText ? `\n\nADAPTA TU RESPUESTA ESTRICTAMENTE A LOS TÍTULOS Y ESTRUCTURA DE ESTA PLANTILLA:\n${templateText}` : "";
 
-  const prompt = `Actúa como experto MINEDU. Desarrolla Plan Anual para ${area}. Formato HTML.${formatInstruccion}`;
+  const prompt = `Actúa como experto MINEDU Perú. Desarrolla Plan Anual para ${area}. Devuelve SOLO HTML puro y usa Tablas HTML. ${formatInstruccion}`;
   await callIA(prompt, 'planOutput', 'btnExportPlan');
 }
 
@@ -541,17 +591,17 @@ async function sendChat() {
   const container = document.getElementById('chatMessages');
   container.innerHTML += `<div class="chat-msg user"><div class="chat-avatar">👤</div><div class="chat-bubble user-bubble">${text}</div></div>`;
   input.value = '';
-  scrollToBottomChat(); // Scroll después del mensaje del usuario
+  scrollToBottomChat(); 
   
   container.innerHTML += `<div id="typing" class="chat-msg ai"><div class="chat-avatar">🤖</div><div class="chat-bubble ai-bubble"><div class="loading" style="width:12px;height:12px;border-width:1.5px"></div></div></div>`;
-  scrollToBottomChat(); // Scroll para ver la animación de carga
+  scrollToBottomChat(); 
   
   try {
     const res = await fetch('/api/generar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: text }) });
     const data = await res.json();
     document.getElementById('typing').remove();
     container.innerHTML += `<div class="chat-msg ai"><div class="chat-avatar">🤖</div><div class="chat-bubble ai-bubble">${data.respuesta}</div></div>`;
-    scrollToBottomChat(); // Scroll final al recibir respuesta
+    scrollToBottomChat(); 
   } catch(e) { 
     document.getElementById('typing').remove(); 
     container.innerHTML += `<div class="chat-msg ai"><div class="chat-avatar">🤖</div><div class="chat-bubble ai-bubble" style="color:red">Error de conexión.</div></div>`;
