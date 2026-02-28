@@ -43,6 +43,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 .link-btn:hover{text-decoration:underline}
 .divider{display:flex;align-items:center;gap:.8rem;margin:1rem 0;color:var(--muted);font-size:.75rem;text-transform:uppercase}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.text-muted{color:var(--muted);font-size:.82rem;text-align:center;margin-top:1rem}
 
 /* Layout */
 .app{display:flex;min-height:100vh}
@@ -54,11 +55,17 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 .sidebar nav a,.sidebar nav button{display:flex;align-items:center;gap:.7rem;padding:.6rem 1.2rem;color:#a0b4c8;font-size:.85rem;font-weight:500;border:none;background:none;width:100%;text-align:left;border-radius:0;transition:all .15s}
 .sidebar nav a:hover,.sidebar nav button:hover{background:rgba(255,255,255,.06);color:#fff}
 .sidebar nav a.active{background:rgba(13,148,136,.15);color:#5eead4;border-right:3px solid var(--primary)}
+.sidebar .user-area{padding:.8rem 1.2rem;border-top:1px solid rgba(255,255,255,.08);font-size:.8rem;color:#7a8fa0}
 .main{flex:1;margin-left:240px;padding:1.5rem 2rem;max-width:960px}
 .main h1{font-size:1.6rem;font-weight:800;margin-bottom:.3rem}
 .main .page-desc{color:var(--muted);font-size:.9rem;margin-bottom:1.5rem}
 
 /* Cards & Stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.8rem;margin-bottom:1.5rem}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;display:flex;align-items:center;gap:.8rem;box-shadow:var(--shadow)}
+.stat-icon{width:40px;height:40px;border-radius:10px;background:var(--secondary);display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:1.1rem}
+.stat-card .val{font-size:1.4rem;font-weight:800}
+.stat-card .lbl{font-size:.72rem;color:var(--muted)}
 .quick-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.6rem;margin-bottom:2rem}
 .qa-btn{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem .8rem;text-align:center;font-size:.8rem;font-weight:600;color:var(--fg);transition:all .15s;box-shadow:var(--shadow)}
 .qa-btn:hover{border-color:var(--primary);background:var(--secondary)}
@@ -78,15 +85,11 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 .file-drop input{display:none}
 .file-name-label{display:none;color:var(--primary);font-size:0.8rem;font-weight:600;margin-top:0.4rem;text-align:center}
 
-/* CNEB info panel & Dynamic areas */
+/* CNEB info panel */
 .cneb-panel{background:linear-gradient(135deg,#f0fdf9,#e6f5f3);border:1px solid #a7f3d0;border-radius:var(--radius);padding:1rem;margin-bottom:1rem;font-size:.82rem}
 .cneb-panel .cneb-title{font-weight:700;color:var(--primary);margin-bottom:.4rem;font-size:.85rem}
 .cneb-tag{display:inline-block;background:var(--primary);color:#fff;border-radius:20px;padding:.15rem .6rem;font-size:.72rem;font-weight:600;margin:.15rem .1rem;cursor:pointer;transition:opacity .15s}
 .cneb-tag:hover{opacity:.8}
-
-.checkbox-list label {display:flex; align-items:flex-start; gap:0.5rem; font-size:0.85rem; margin-bottom:0.4rem; font-weight:normal;}
-.checkbox-list input {margin-top:0.2rem;}
-.desempenos-box {background:#f8fffe; border:1px solid var(--border); border-radius:8px; padding:0.8rem; font-size:0.85rem; color:var(--muted); margin-top:0.4rem;}
 
 /* Output - rendered HTML */
 .output-rendered{background:#fff;border:1px solid #a7f3d0;border-radius:var(--radius);padding:1.5rem 2rem;margin-top:1rem;font-size:.9rem;line-height:1.8;max-height:600px;overflow-y:auto}
@@ -95,21 +98,17 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 .output-rendered table{width:100%;border-collapse:collapse;font-size:.82rem;margin:.5rem 0}
 .output-rendered th{background:var(--primary);color:#fff;padding:.5rem .7rem;text-align:left;font-weight:600}
 .output-rendered td{border:1px solid var(--border);padding:.5rem .7rem;vertical-align:top}
+.output-rendered tr:nth-child(even) td{background:#f8fffe}
 
-/* Loading */
+/* Loading animation */
 .loading{display:inline-block;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .gen-loading{display:flex;align-items:center;gap:.8rem;padding:1.5rem;background:var(--secondary);border-radius:var(--radius);font-size:.9rem;color:var(--sec-fg);font-weight:600;margin-top:1rem}
 
-/* Chat */
-.chat-msg{display:flex;gap:.5rem;align-items:flex-start; margin-bottom: 0.8rem;}
-.chat-msg.user{flex-direction:row-reverse}
-.chat-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
-.chat-msg.ai .chat-avatar{background:var(--primary);color:#fff}
-.chat-msg.user .chat-avatar{background:var(--accent);color:#fff}
-.chat-bubble{max-width:80%;padding:.6rem 1rem;border-radius:16px;font-size:.85rem;line-height:1.6}
-.ai-bubble{background:var(--secondary);color:var(--fg);border-bottom-left-radius:4px}
-.user-bubble{background:var(--primary);color:#fff;border-bottom-right-radius:4px}
+/* Tabs */
+.tabs{display:flex;gap:.3rem;border-bottom:2px solid var(--border);margin-bottom:1.2rem}
+.tab{padding:.5rem 1rem;font-size:.85rem;font-weight:600;border:none;background:none;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
 
 /* Mobile */
 .menu-toggle{display:none;position:fixed;top:.8rem;left:.8rem;z-index:60;background:var(--primary);color:#fff;border:none;border-radius:8px;width:40px;height:40px;font-size:1.2rem}
@@ -120,6 +119,23 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
   .menu-toggle{display:flex;align-items:center;justify-content:center}
 }
 .hidden{display:none!important}
+
+/* Chat */
+.chat-msg{display:flex;gap:.5rem;align-items:flex-start}
+.chat-msg.user{flex-direction:row-reverse}
+.chat-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.chat-msg.ai .chat-avatar{background:var(--primary);color:#fff}
+.chat-msg.user .chat-avatar{background:var(--accent);color:#fff}
+.chat-bubble{max-width:80%;padding:.6rem 1rem;border-radius:16px;font-size:.85rem;line-height:1.6}
+.ai-bubble{background:var(--secondary);color:var(--fg);border-bottom-left-radius:4px}
+.user-bubble{background:var(--primary);color:#fff;border-bottom-right-radius:4px}
+.sug-btn{padding:.35rem .8rem;border-radius:20px;border:1px solid var(--border);background:var(--secondary);color:var(--sec-fg);font-size:.75rem;font-weight:500;cursor:pointer;transition:all .15s}
+.sug-btn:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+/* Nuevas clases para los Checkboxes y Desempeños dinámicos */
+.checkbox-list label {display:flex; align-items:flex-start; gap:0.5rem; font-size:0.85rem; margin-bottom:0.4rem; font-weight:normal;}
+.checkbox-list input {margin-top:0.2rem;}
+.desempenos-box {background:#f8fffe; border:1px solid var(--border); border-radius:8px; padding:0.8rem; font-size:0.85rem; color:var(--muted); margin-top:0.4rem;}
 </style>
 </head>
 <body>
@@ -169,7 +185,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
         <div class="form-group">
           <label>Plantilla o Formato Base (Admite .txt y .docx)</label>
           <div class="file-drop" onclick="document.getElementById('sesFile').click()">
-            📄 Haz clic para subir tu formato base (.txt o Word .docx)
+            📄 Haz clic para subir tu formato base (.txt o Word .docx) y la IA seguirá esa estructura.
             <input type="file" id="sesFile" accept=".txt, .doc, .docx" onchange="showFileName(this, 'sesFileName')">
           </div>
           <div id="sesFileName" class="file-name-label"></div>
@@ -189,8 +205,8 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
         <div class="form-group"><label>Competencia seleccionada</label><select id="sesCompetencia" onchange="onCompetenciaChange('ses')"><option value="">-- Selecciona --</option></select></div>
         
         <div class="form-group">
-          <label>Capacidades (Marca las que usarás)</label>
-          <div id="sesCapacidades" class="checkbox-list">Selecciona una competencia arriba.</div>
+          <label>Capacidades</label>
+          <div id="sesCapacidades" class="checkbox-list">Selecciona un área y competencia arriba.</div>
         </div>
         
         <div class="form-group">
@@ -209,7 +225,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
         <div class="form-group">
           <label>Plantilla o Formato Base (Admite .txt y .docx)</label>
           <div class="file-drop" onclick="document.getElementById('uniFile').click()">
-            📄 Haz clic para subir tu formato base (.txt o Word .docx)
+            📄 Haz clic para subir tu formato base (.txt o Word .docx).
             <input type="file" id="uniFile" accept=".txt, .doc, .docx" onchange="showFileName(this, 'uniFileName')">
           </div>
           <div id="uniFileName" class="file-name-label"></div>
@@ -231,7 +247,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
         <div class="form-group">
           <label>Plantilla o Formato Base (Admite .txt y .docx)</label>
           <div class="file-drop" onclick="document.getElementById('planFile').click()">
-            📄 Haz clic para subir tu formato base (.txt o Word .docx)
+            📄 Haz clic para subir tu formato base (.txt o Word .docx).
             <input type="file" id="planFile" accept=".txt, .doc, .docx" onchange="showFileName(this, 'planFileName')">
           </div>
           <div id="planFileName" class="file-name-label"></div>
@@ -249,7 +265,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
     <div id="page-asistente" class="hidden">
       <h1>🤖 Asistente Pedagógico IA</h1>
       <div class="card" style="display:flex;flex-direction:column;height:calc(100vh - 12rem);padding:0;overflow:hidden">
-        <div id="chatMessages" style="flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;">
+        <div id="chatMessages" style="flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.6rem">
           <div class="chat-msg ai"><div class="chat-avatar">🤖</div><div class="chat-bubble ai-bubble">¡Hola! Soy tu asistente. ¿En qué te ayudo?</div></div>
         </div>
         <div style="padding:.8rem 1rem;border-top:1px solid var(--border);display:flex;gap:.5rem">
@@ -343,7 +359,7 @@ function onAreaChange(prefix) {
     sel.innerHTML = '<option value="">-- Selecciona --</option>';
     comps.forEach((c, i) => { sel.innerHTML += `<option value="${i}">${c.name}</option>`; });
     document.getElementById('sesCnebCompetencias').innerHTML = comps.map((c, i) => `<span class="cneb-tag" onclick="selectCompetencia(${i})">${c.name}</span>`).join('');
-    document.getElementById('sesCapacidades').innerHTML = "Selecciona una competencia arriba.";
+    document.getElementById('sesCapacidades').innerHTML = "Selecciona un área y competencia arriba.";
     document.getElementById('sesDesempenos').innerHTML = "Selecciona capacidades para ver los desempeños.";
   } else if (prefix === 'uni') {
     document.getElementById('uniCnebCompetencias').innerHTML = comps.map(c => `<span class="cneb-tag" onclick="addCompetenciaToTextarea('uniCompetencias', '${c.name}')">${c.name}</span>`).join('');
@@ -362,7 +378,7 @@ function addCompetenciaToTextarea(id, compName) {
   ta.value = ta.value ? ta.value + '\n- ' + compName : '- ' + compName;
 }
 
-// Actualizar Capacidades
+// Actualizar Capacidades y Desempeños dinámicamente
 function onCompetenciaChange(prefix) {
   const area = document.getElementById(prefix + 'Area').value;
   const compIdx = document.getElementById(prefix + 'Competencia').value;
@@ -371,23 +387,20 @@ function onCompetenciaChange(prefix) {
   const desContainer = document.getElementById(prefix + 'Desempenos');
   
   if (compIdx === '') {
-    capContainer.innerHTML = 'Selecciona una competencia arriba.';
+    capContainer.innerHTML = 'Selecciona un área y competencia arriba.';
     desContainer.innerHTML = 'Selecciona capacidades para ver los desempeños.';
     return;
   }
   
   const caps = areasCNEB[area][compIdx].caps;
   
-  // Renderizar checkboxes de capacidades
   capContainer.innerHTML = caps.map((cap, capIdx) => 
     `<label><input type="checkbox" class="chk-capacidad" value="${capIdx}" onchange="updateDesempenos('${prefix}')" checked> ${cap.name}</label>`
   ).join('');
   
-  // Cargar desempeños iniciales
   updateDesempenos(prefix);
 }
 
-// Actualizar Desempeños dinámicamente según las capacidades marcadas
 function updateDesempenos(prefix) {
   const area = document.getElementById(prefix + 'Area').value;
   const compIdx = document.getElementById(prefix + 'Competencia').value;
@@ -443,7 +456,6 @@ async function readFileText(inputId) {
       const reader = new FileReader();
       reader.onload = function(event) {
         const arrayBuffer = event.target.result;
-        // Mammoth.js extrae el texto puro del documento Word
         mammoth.extractRawText({arrayBuffer: arrayBuffer})
           .then(result => resolve(result.value))
           .catch(err => {
@@ -461,7 +473,7 @@ async function readFileText(inputId) {
 // ====== LLAMADAS A LA IA ======
 async function callIA(prompt, outputId) {
   const output = document.getElementById(outputId);
-  output.innerHTML = '<div class="gen-loading"><div class="loading"></div>Generando contenido pedagógico...</div>';
+  output.innerHTML = '<div class="gen-loading"><div class="loading"></div>Generando contenido...</div>';
   try {
     const res = await fetch('/api/generar', {
       method: 'POST',
@@ -476,32 +488,28 @@ async function callIA(prompt, outputId) {
   }
 }
 
-// CONSTRUCCIÓN DINÁMICA DE PROMPTS
 async function generarSesionIA() {
   const area = document.getElementById('sesArea').value;
-  const titulo = document.getElementById('sesTitulo').value || "Tema propuesto por la IA";
+  const titulo = document.getElementById('sesTitulo').value || "Tema libre";
   const compSelect = document.getElementById('sesCompetencia');
   const competencia = compSelect.options[compSelect.selectedIndex]?.text || "No especificada";
   
-  // Recoger capacidades seleccionadas
   const capNodes = document.querySelectorAll('#sesCapacidades .chk-capacidad:checked');
   const capacidades = Array.from(capNodes).map(n => n.parentNode.textContent.trim()).join(", ");
   
-  // Recoger desempeños seleccionados
   const desNodes = document.querySelectorAll('#sesDesempenos .chk-desempeno:checked');
   const desempenos = Array.from(desNodes).map(n => n.value).join(" | ");
 
-  // Leer plantilla (txt o word)
   let templateText = await readFileText('sesFile');
-  let formatInstruccion = templateText ? `\n\n=== REGLA ESTRICTA ===\nUtiliza la siguiente estructura y esquema como plantilla para tu respuesta, llenando los campos correspondientes:\n\n${templateText}` : "";
+  let formatInstruccion = templateText ? `\n\nUTILIZA ESTRICTAMENTE ESTE ESQUEMA/FORMATO PARA TU RESPUESTA:\n${templateText}` : "";
   
-  const prompt = `Actúa como un experto pedagógico del MINEDU Perú. Desarrolla una Sesión de Aprendizaje CNEB.
+  const prompt = `Actúa como experto MINEDU. Desarrolla una Sesión de Aprendizaje CNEB.
 Datos de la sesión:
 - Área: ${area}
 - Tema: ${titulo}
 - Competencia: ${competencia}
-- Capacidades a movilizar: ${capacidades || 'A sugerencia de la IA'}
-- Desempeños precisados: ${desempenos || 'A sugerencia de la IA'}
+- Capacidades seleccionadas: ${capacidades || 'A sugerir'}
+- Desempeños seleccionados: ${desempenos || 'A sugerir'}
 ${formatInstruccion}`;
 
   await callIA(prompt, 'sesOutput');
@@ -513,13 +521,9 @@ async function generarUnidadIA() {
   const competencias = document.getElementById('uniCompetencias').value;
   
   let templateText = await readFileText('uniFile');
-  let formatInstruccion = templateText ? `\n\n=== REGLA ESTRICTA ===\nUtiliza la siguiente estructura y esquema como plantilla para tu respuesta:\n\n${templateText}` : "";
+  let formatInstruccion = templateText ? `\n\nUTILIZA ESTRICTAMENTE ESTE ESQUEMA/FORMATO PARA TU RESPUESTA:\n${templateText}` : "";
   
-  const prompt = `Actúa como experto MINEDU. Desarrolla una Unidad Didáctica CNEB.
-- Área: ${area}
-- Título/Situación Significativa: ${titulo}
-- Competencias: ${competencias}
-${formatInstruccion}`;
+  const prompt = `Actúa como experto MINEDU. Desarrolla una Unidad Didáctica CNEB. Tema: ${titulo}. Área: ${area}. Competencias: ${competencias}. ${formatInstruccion}`;
   
   await callIA(prompt, 'uniOutput');
 }
@@ -529,12 +533,9 @@ async function generarPlanAnualIA() {
   const competencias = document.getElementById('planCompetencias').value;
   
   let templateText = await readFileText('planFile');
-  let formatInstruccion = templateText ? `\n\n=== REGLA ESTRICTA ===\nUtiliza la siguiente estructura y esquema como plantilla para tu respuesta:\n\n${templateText}` : "";
+  let formatInstruccion = templateText ? `\n\nUTILIZA ESTRICTAMENTE ESTE ESQUEMA/FORMATO PARA TU RESPUESTA:\n${templateText}` : "";
   
-  const prompt = `Actúa como experto MINEDU. Desarrolla un Plan Anual CNEB.
-- Área: ${area}
-- Competencias a priorizar: ${competencias}
-${formatInstruccion}`;
+  const prompt = `Actúa como experto MINEDU. Desarrolla un Plan Anual CNEB para ${area}. Competencias: ${competencias}. ${formatInstruccion}`;
   
   await callIA(prompt, 'planOutput');
 }
@@ -553,7 +554,7 @@ async function sendChat() {
     const res = await fetch('/api/generar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: `Actúa como Experto CNEB. Responde a esto: ${text}` })
+      body: JSON.stringify({ prompt: `Experto CNEB: ${text}` })
     });
     const data = await res.json();
     document.getElementById('typing').remove();
