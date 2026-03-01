@@ -40,6 +40,9 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 .btn-outline:hover{background:var(--secondary)}
 .btn-success{background:#10b981;color:#fff;width:auto;margin-top:1rem;display:none}
 .btn-success:hover{background:#059669}
+.btn-sm{padding:.45rem 1rem;font-size:.8rem}
+.link-btn{background:none;border:none;color:var(--primary);font-size:.8rem;font-weight:500}
+.link-btn:hover{text-decoration:underline}
 .divider{display:flex;align-items:center;gap:.8rem;margin:1rem 0;color:var(--muted);font-size:.75rem;text-transform:uppercase}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
 
@@ -79,8 +82,8 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 .form-group textarea{width:100%;padding:.6rem .8rem;border:1px solid var(--border);border-radius:8px;outline:none;resize:vertical;min-height:80px}
 .form-group textarea:focus{border-color:var(--primary)}
 
-.file-drop{border:2px dashed var(--border);border-radius:var(--radius);padding:1.5rem;text-align:center;color:var(--muted);font-size:.85rem;cursor:pointer;transition:all .2s ease;margin-top:.5rem;background:#faf9f6}
-.file-drop:hover, .file-drop.dragover{border-color:var(--primary);background:var(--secondary);color:var(--sec-fg)}
+.file-drop{border:2px dashed var(--border);border-radius:var(--radius);padding:1.5rem;text-align:center;color:var(--muted);font-size:.85rem;cursor:pointer;transition:border .2s;margin-top:.5rem;background:#faf9f6}
+.file-drop:hover{border-color:var(--primary);background:var(--secondary);color:var(--sec-fg)}
 .file-drop input{display:none}
 .file-name-label{display:none;color:var(--primary);font-size:0.8rem;font-weight:600;margin-top:0.4rem;text-align:center}
 
@@ -259,7 +262,6 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
       <h1>📚 Unidad Didáctica</h1>
       <div class="card">
         <h3>Datos de la unidad</h3>
-
         <div class="form-group">
           <label>Plantilla o Formato Base (Word)</label>
           <div class="file-drop" onclick="document.getElementById('uniFile').click()">
@@ -268,7 +270,6 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
           </div>
           <div id="uniFileName" class="file-name-label"></div>
         </div>
-
         <div class="form-row">
           <div class="form-group">
             <label>Área Curricular</label>
@@ -280,12 +281,9 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
             </select>
           </div>
         </div>
-
         <div id="uniCnebPanel" class="cneb-panel"><div class="cneb-title">📋 Competencias CNEB (haz clic)</div><div id="uniCnebCompetencias"></div></div>
-
         <div class="form-group"><label>Título de la Unidad</label><input id="uniTitulo"></div>
         <div class="form-group"><label>Competencias a trabajar</label><textarea id="uniCompetencias" style="min-height:70px"></textarea></div>
-        
         <div style="margin-top:1rem;display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
           <button class="btn btn-primary" onclick="generarUnidadIA()" style="width:auto">✨ Generar Unidad con IA</button>
           <button id="btnExportUni" class="btn btn-success" onclick="exportToWord('uniOutput', 'Unidad_Didactica')">📥 Descargar en Word</button>
@@ -298,7 +296,6 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
       <h1>📅 Planificación Curricular Anual</h1>
       <div class="card">
         <h3>Datos generales</h3>
-
         <div class="form-group">
           <label>Plantilla o Formato Base (Word)</label>
           <div class="file-drop" onclick="document.getElementById('planFile').click()">
@@ -307,7 +304,6 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
           </div>
           <div id="planFileName" class="file-name-label"></div>
         </div>
-
         <div class="form-row">
           <div class="form-group">
             <label>Área Curricular</label>
@@ -319,11 +315,8 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
             </select>
           </div>
         </div>
-
         <div id="planCnebPanel" class="cneb-panel"><div class="cneb-title">📋 Competencias CNEB (haz clic)</div><div id="planCnebCompetencias"></div></div>
-
         <div class="form-group"><label>Competencias del área</label><textarea id="planCompetencias" style="min-height:70px"></textarea></div>
-        
         <div style="margin-top:1rem;display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
           <button class="btn btn-primary" onclick="generarPlanAnualIA()" style="width:auto">✨ Generar Planificación con IA</button>
           <button id="btnExportPlan" class="btn btn-success" onclick="exportToWord('planOutput', 'Planificacion_Anual')">📥 Descargar en Word</button>
@@ -347,12 +340,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 </div>
 
 <script>
-// =====================================================================
-// 🔑 CONFIGURACIÓN DE IA EN VERCEL
-// El sistema se conecta a tu API en Vercel para mayor seguridad.
-// =====================================================================
-
-// --- ÁREAS, COMPETENCIAS Y CAPACIDADES CNEB ---
+// --- ÁREAS, COMPETENCIAS Y CAPACIDADES CNEB SECUNDARIA COMPLETAS ---
 const areasCNEB = {
   "Comunicación": [
     { name: "Se comunica oralmente en su lengua materna", caps: ["Obtiene información del texto oral", "Infiere e interpreta información del texto oral", "Adecúa, organiza y desarrolla las ideas de forma coherente y cohesionada", "Utiliza recursos no verbales y paraverbales de forma estratégica", "Interactúa estratégicamente con distintos interlocutores", "Reflexiona y evalúa la forma, el contenido y contexto del texto oral"] },
@@ -456,7 +444,6 @@ function onCompetenciaChange(prefix) {
   if (prefix === 'ses') updateDesempenoAutomatico();
 }
 
-// NUEVA FUNCIÓN: Genera un desempeño modelo automáticamente
 function updateDesempenoAutomatico() {
   const compSelect = document.getElementById('sesCompetencia');
   if(!compSelect || compSelect.value === '') return;
@@ -503,27 +490,25 @@ function exportToWord(elementId, filename) {
   const contentEl = document.getElementById(elementId).querySelector('.output-rendered');
   if (!contentEl) return alert("No hay documento generado para exportar.");
 
-  // Limpieza agresiva: Quita bloques de código, etiquetas <style> de la IA y saltos de línea basura
+  // Limpieza extremadamente agresiva: Elimina TODO código CSS visible, etiquetas huérfanas y espacios.
   let rawHTML = contentEl.innerHTML
-      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '') // Elimina <style> generado por IA
+      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '') // Destruye cualquier <style> inyectado por la IA
       .replace(/```html/gi, '')
       .replace(/```css/gi, '')
       .replace(/```/g, '')
-      .replace(/<p>[\s\xA0\n\r]*<\/p>/gi, '') 
-      .replace(/<div>[\s\xA0\n\r]*<\/div>/gi, '') 
-      .replace(/(<br\s*\/?>[\s\n\r]*){2,}/gi, '<br>') 
-      .replace(/ margin-bottom: [^;]+;/gi, '') 
-      .replace(/ margin-top: [^;]+;/gi, '')
+      .replace(/<p>[\s\xA0\n\r]*<\/p>/gi, '') // Elimina párrafos vacíos
+      .replace(/<div>[\s\xA0\n\r]*<\/div>/gi, '') // Elimina divs vacíos
+      .replace(/(<br\s*\/?>[\s\n\r]*){2,}/gi, '<br>') // Evita dobles saltos de línea
       .trim();
 
   // CSS inyectado estrictamente para Microsoft Word, ultra compacto.
   const styles = `
     <style>
       @page { margin: 1cm; mso-page-orientation: portrait; }
-      body { font-family: 'Arial', sans-serif; line-height: 1.0; color: #000; margin: 0; padding: 0; font-size: 9.5pt; }
+      body { font-family: 'Arial', sans-serif; line-height: 1.0; color: #000; margin: 0; padding: 0; font-size: 10pt; }
       .container { max-width: 100%; margin: auto; }
       h1, h2, h3, h4 { color: #0056b3; margin: 4pt 0 2pt 0; padding: 0; line-height: 1.0; }
-      h1 { font-size: 12pt; text-align: center; border-bottom: 1.5pt solid #0056b3; padding-bottom: 2pt; }
+      h1 { font-size: 13pt; text-align: center; border-bottom: 1.5pt solid #0056b3; padding-bottom: 2pt; }
       h2 { font-size: 11pt; border-bottom: 1px solid #a0cffc; background: #f8fbff; }
       h3 { font-size: 10pt; color: #007bff; }
       table { width: 100%; border-collapse: collapse; margin: 2pt 0 4pt 0; font-size: 9pt; }
@@ -535,10 +520,8 @@ function exportToWord(elementId, filename) {
       li { margin-bottom: 0; }
       p { margin: 0 0 2pt 0; }
       p.MsoNormal, li.MsoNormal, div.MsoNormal { margin: 0; margin-bottom: .0001pt; }
-      .signature-line { margin-top: 15px; text-align: center; display: flex; justify-content: space-around; width: 100%; }
+      .signature-line { margin-top: 25px; text-align: center; display: flex; justify-content: space-around; width: 100%; }
       .signature-line div { width: 30%; border-top: 1px solid #000; padding-top: 2px; font-size: 9pt; }
-      .matrix-table th, .matrix-table td { text-align: center; }
-      .matrix-table th:first-child, .matrix-table td:first-child { text-align: left; }
     </style>
   `;
 
@@ -595,7 +578,7 @@ async function callIA(prompt, outputId, btnExportId) {
   }
 }
 
-// Generación de Sesión con Reglas Estrictas
+// ====== GENERACIÓN DE SESIÓN CON PLANTILLA ESTRICTA ======
 async function generarSesionIA() {
   const titulo = document.getElementById('sesTitulo').value || "Tema Libre";
   const area = document.getElementById('sesArea').value;
@@ -605,30 +588,51 @@ async function generarSesionIA() {
   const desempeño = document.getElementById('sesDesempeno').value || "No especificado";
   
   const capNodes = document.querySelectorAll('#sesCapacidades input:checked');
-  let capacidades = Array.from(capNodes).map(n => n.parentNode.textContent.trim()).join(', ') || "No especificadas";
+  let capacidades = Array.from(capNodes).map(n => `<li>${n.parentNode.textContent.trim()}</li>`).join('');
+  if(!capacidades) capacidades = "<li>No especificadas</li>";
 
   let templateText = await readFileWord('sesFile');
-  let formatInstruccion = templateText ? `\n\nADAPTA TU RESPUESTA ESTRICTAMENTE A LOS TÍTULOS Y ESTRUCTURA DE ESTA PLANTILLA SUBIDA POR EL USUARIO:\n${templateText}` : "";
+  let formatInstruccion = templateText ? `Considera el contenido de esta plantilla subida: \n${templateText}` : "";
 
-  // Prompt con prohibición de usar <style> y orden de salto de página
-  const prompt = `Actúa como experto MINEDU Perú. Desarrolla una Sesión de Aprendizaje detallada y COMPLETA.
-Datos a utilizar OBLIGATORIAMENTE en tu respuesta:
-- Área Curricular: ${area}
-- Grado: ${grado}
-- Título de Sesión: ${titulo}
-- Competencia: ${competencia}
-- Capacidades: ${capacidades}
-- Desempeño precisado: ${desempeño}
+  // Prompt con ESTRUCTURA LITERAL OBLIGATORIA. Esto asegura que la IA no invente diseños.
+  const prompt = `Actúa como experto MINEDU Perú. Desarrolla una Sesión de Aprendizaje.
+${formatInstruccion}
 
-REGLAS ESTRICTAS DE DISEÑO COMPACTO Y ESQUEMA:
-1. NO INCLUYAS ETIQUETAS <style> NI CÓDIGO CSS. SOLO HTML PURO (<table>, <h2>, <p>, <ul>).
-2. Tu respuesta DEBE COMENZAR con una tabla de "Datos Informativos" y otra de "Propósitos de Aprendizaje" mostrando obligatoriamente el Área, Grado, Título, Competencia, Capacidades y Desempeño dados.
-3. Utiliza Tablas HTML compactas (<table>, <tr>, <th>, <td>) para estructurar toda la Secuencia Didáctica. Sé muy breve y directo usando viñetas.
-4. EVITA saltos de línea innecesarios (<br>) o párrafos vacíos (<p></p>). 
-5. MUY IMPORTANTE: La sección de Evaluación o Lista de Cotejo DEBE ir en una hoja aparte. Para lograrlo, escribe exactamente este código HTML: <br clear="all" style="page-break-before:always" /> justo antes de la etiqueta <h2>Evaluación</h2> o <h2>Lista de Cotejo</h2>.
-6. Al final de la sesión (antes del salto de página de la evaluación), incluye SIEMPRE un bloque para firmas con esta estructura exacta en HTML: 
+REGLA DE ORO: TIENES PROHIBIDO INVENTAR HTML O ETIQUETAS <style>.
+Debes devolver EXACTAMENTE ESTA PLANTILLA HTML copiándola tal cual y rellenando la información requerida en su interior con contenido de alto valor pedagógico:
+
+<h2>1. Datos Informativos</h2>
+<table>
+  <tr><th>Área Curricular</th><td>${area}</td><th>Grado</th><td>${grado}</td></tr>
+  <tr><th>Título de la Sesión</th><td colspan="3">${titulo}</td></tr>
+</table>
+
+<h2>2. Propósitos de Aprendizaje</h2>
+<table>
+  <tr><th>Competencia</th><th>Capacidades</th><th>Desempeño Precisado</th></tr>
+  <tr><td><strong>${competencia}</strong></td><td><ul>${capacidades}</ul></td><td>${desempeño}</td></tr>
+</table>
+
+<h2>3. Secuencia Didáctica</h2>
+<table>
+  <tr><th style="width:15%">Momentos</th><th>Actividades / Estrategias (Se muy detallado pero usa viñetas)</th><th style="width:15%">Tiempo</th></tr>
+  <tr><td><strong>INICIO</strong></td><td>[Aquí redacta las estrategias de inicio]</td><td>15 min</td></tr>
+  <tr><td><strong>DESARROLLO</strong></td><td>[Aquí redacta las estrategias de desarrollo]</td><td>60 min</td></tr>
+  <tr><td><strong>CIERRE</strong></td><td>[Aquí redacta las estrategias de cierre]</td><td>15 min</td></tr>
+</table>
+
 <div class="signature-line"><div>DOCENTE</div><div>COORDINADOR</div><div>DIRECTOR(A)</div></div>
-${formatInstruccion}`;
+
+<br clear="all" style="page-break-before:always" />
+
+<h2>4. Lista de Cotejo</h2>
+<table>
+  <tr><th>Nº</th><th>Nombres y Apellidos</th><th>Criterio 1: [Define criterio]</th><th>Criterio 2: [Define criterio]</th><th>Observaciones</th></tr>
+  <tr><td>01</td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>02</td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>03</td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>04</td><td></td><td></td><td></td><td></td></tr>
+</table>`;
 
   await callIA(prompt, 'sesOutput', 'btnExportSes');
 }
@@ -637,18 +641,20 @@ async function generarUnidadIA() {
   const titulo = document.getElementById('uniTitulo').value || "Unidad Libre";
   const area = document.getElementById('uniArea').value;
   let templateText = await readFileWord('uniFile');
-  let formatInstruccion = templateText ? `\n\nADAPTA TU RESPUESTA ESTRICTAMENTE A LOS TÍTULOS Y ESTRUCTURA DE ESTA PLANTILLA:\n${templateText}` : "";
+  let formatInstruccion = templateText ? `\n\nADAPTA TU RESPUESTA A ESTA PLANTILLA:\n${templateText}` : "";
 
-  const prompt = `Actúa como experto MINEDU Perú. Desarrolla Unidad Didáctica. Tema: ${titulo}. Área: ${area}. Devuelve SOLO HTML puro sin <style> ni CSS. Usa Tablas HTML para los datos. Evita generar espacios en blanco, <br> excesivos o párrafos vacíos. ${formatInstruccion}`;
+  const prompt = `Actúa como experto MINEDU Perú. Crea una Unidad Didáctica. Tema: ${titulo}. Área: ${area}. 
+  DEVUELVE SOLO HTML PURO estructurado en Tablas. NO INCLUYAS ETIQUETAS <style>. ${formatInstruccion}`;
   await callIA(prompt, 'uniOutput', 'btnExportUni');
 }
 
 async function generarPlanAnualIA() {
   const area = document.getElementById('planArea').value;
   let templateText = await readFileWord('planFile');
-  let formatInstruccion = templateText ? `\n\nADAPTA TU RESPUESTA ESTRICTAMENTE A LOS TÍTULOS Y ESTRUCTURA DE ESTA PLANTILLA:\n${templateText}` : "";
+  let formatInstruccion = templateText ? `\n\nADAPTA TU RESPUESTA A ESTA PLANTILLA:\n${templateText}` : "";
 
-  const prompt = `Actúa como experto MINEDU Perú. Desarrolla Plan Anual para ${area}. Devuelve SOLO HTML puro sin <style> ni CSS. Usa Tablas HTML para la organización. Evita generar espacios en blanco, <br> excesivos o párrafos vacíos. ${formatInstruccion}`;
+  const prompt = `Actúa como experto MINEDU Perú. Crea un Plan Anual para ${area}. 
+  DEVUELVE SOLO HTML PURO estructurado en Tablas. NO INCLUYAS ETIQUETAS <style>. ${formatInstruccion}`;
   await callIA(prompt, 'planOutput', 'btnExportPlan');
 }
 
