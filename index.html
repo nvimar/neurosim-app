@@ -132,21 +132,22 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
     <div class="auth-logo">N</div>
     <h1>Neurosim</h1>
     <p class="subtitle">Planificador de Clases – CNEB</p>
-    <p class="desc">Genera sesiones y unidades con Inteligencia Artificial.</p>
+    <p class="desc">Genera sesiones y unidades alineadas al Currículo Nacional con Inteligencia Artificial.</p>
     <div class="auth-card">
-      <h2>🔐 Iniciar sesión y conectar IA</h2>
+      <h2>🔐 Iniciar sesión</h2>
       <form id="loginForm" onsubmit="enterApp(event)">
         <div class="form-group">
           <label>Correo electrónico</label>
           <input type="email" id="loginEmail" placeholder="correo@ejemplo.com" required>
         </div>
-        <div class="form-group" style="background:#f8f9fa; padding:10px; border-radius:8px; border:1px solid #e2e8f0;">
-          <label style="color:#0d9488">🔑 API Key (Google Gemini)</label>
-          <input type="password" id="apiKeyValue" placeholder="Pega tu clave API aquí..." style="font-size:0.85rem">
-          <div style="font-size:0.7rem; color:#666; margin-top:5px;">Si la dejas en blanco, se usará el motor local de emergencia.</div>
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input type="password" id="loginPass" placeholder="••••••••" required>
         </div>
-        <button type="submit" class="btn btn-primary" style="margin-top:.5rem">Entrar al Sistema →</button>
+        <button type="submit" class="btn btn-primary" style="margin-top:.5rem">Entrar →</button>
       </form>
+      <div class="divider">o</div>
+      <button class="btn btn-outline" onclick="enterApp()">Acceder como invitado</button>
     </div>
   </div>
 </div>
@@ -193,6 +194,19 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
       <div class="card">
         <h3>Datos de la sesión</h3>
         
+        <div class="form-group">
+          <label>Plantilla o Formato Base (Word)</label>
+          <div class="file-drop" 
+               onclick="document.getElementById('sesFile').click()"
+               ondragover="event.preventDefault(); this.classList.add('dragover')"
+               ondragleave="this.classList.remove('dragover')"
+               ondrop="event.preventDefault(); this.classList.remove('dragover'); const inp=document.getElementById('sesFile'); inp.files=event.dataTransfer.files; showFileName(inp, 'sesFileName')">
+            📄 Haz clic o arrastra tu formato base (.docx) aquí.
+            <input type="file" id="sesFile" accept=".docx" onchange="showFileName(this, 'sesFileName')">
+          </div>
+          <div id="sesFileName" class="file-name-label"></div>
+        </div>
+
         <div class="form-row">
           <div class="form-group">
             <label>Área Curricular</label>
@@ -227,7 +241,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
         </div>
         
         <div style="margin-top:1rem;display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
-          <button class="btn btn-primary" onclick="generarDocumento('sesion')" style="width:auto">✨ Generar con IA</button>
+          <button class="btn btn-primary" onclick="generarDocumento('sesion')" style="width:auto">✨ Generar Sesión con IA</button>
           <button id="btnExportSes" class="btn btn-success" onclick="exportToWord('sesOutput', 'Sesion_de_Aprendizaje')">📥 Descargar en Word</button>
         </div>
       </div>
@@ -238,12 +252,28 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
       <h1>📚 Unidad Didáctica</h1>
       <div class="card">
         <h3>Datos de la unidad</h3>
+        
+        <div class="form-group">
+          <label>Plantilla o Formato Base (Word)</label>
+          <div class="file-drop" 
+               onclick="document.getElementById('uniFile').click()"
+               ondragover="event.preventDefault(); this.classList.add('dragover')"
+               ondragleave="this.classList.remove('dragover')"
+               ondrop="event.preventDefault(); this.classList.remove('dragover'); const inp=document.getElementById('uniFile'); inp.files=event.dataTransfer.files; showFileName(inp, 'uniFileName')">
+            📄 Haz clic o arrastra tu formato base (.docx) aquí.
+            <input type="file" id="uniFile" accept=".docx" onchange="showFileName(this, 'uniFileName')">
+          </div>
+          <div id="uniFileName" class="file-name-label"></div>
+        </div>
+
         <div class="form-row">
           <div class="form-group">
             <label>Área Curricular</label>
             <select id="uniArea" onchange="onAreaChange('uni')">
               <option>Comunicación</option><option>Matemática</option><option>Ciencia y Tecnología</option>
-              <option>Ciencias Sociales</option><option>DPCC</option>
+              <option>Ciencias Sociales</option><option>Desarrollo Personal, Ciudadanía y Cívica (DPCC)</option>
+              <option>Educación para el Trabajo (EPT)</option><option>Inglés</option>
+              <option>Arte y Cultura</option><option>Educación Física</option><option>Educación Religiosa</option>
             </select>
           </div>
         </div>
@@ -252,7 +282,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
         <div class="form-group"><label>Competencias a trabajar</label><textarea id="uniCompetencias" style="min-height:70px"></textarea></div>
         
         <div style="margin-top:1rem;display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
-          <button class="btn btn-primary" onclick="generarDocumento('unidad')" style="width:auto">✨ Generar con IA</button>
+          <button class="btn btn-primary" onclick="generarDocumento('unidad')" style="width:auto">✨ Generar Unidad con IA</button>
           <button id="btnExportUni" class="btn btn-success" onclick="exportToWord('uniOutput', 'Unidad_Didactica')">📥 Descargar en Word</button>
         </div>
       </div>
@@ -263,11 +293,35 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
       <h1>📅 Planificación Curricular Anual</h1>
       <div class="card">
         <h3>Datos generales</h3>
-        <div class="form-row"><div class="form-group"><label>Área Curricular</label><select id="planArea" onchange="onAreaChange('plan')"><option>Comunicación</option><option>Matemática</option></select></div></div>
+        
+        <div class="form-group">
+          <label>Plantilla o Formato Base (Word)</label>
+          <div class="file-drop" 
+               onclick="document.getElementById('planFile').click()"
+               ondragover="event.preventDefault(); this.classList.add('dragover')"
+               ondragleave="this.classList.remove('dragover')"
+               ondrop="event.preventDefault(); this.classList.remove('dragover'); const inp=document.getElementById('planFile'); inp.files=event.dataTransfer.files; showFileName(inp, 'planFileName')">
+            📄 Haz clic o arrastra tu formato base (.docx) aquí.
+            <input type="file" id="planFile" accept=".docx" onchange="showFileName(this, 'planFileName')">
+          </div>
+          <div id="planFileName" class="file-name-label"></div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Área Curricular</label>
+            <select id="planArea" onchange="onAreaChange('plan')">
+              <option>Comunicación</option><option>Matemática</option><option>Ciencia y Tecnología</option>
+              <option>Ciencias Sociales</option><option>Desarrollo Personal, Ciudadanía y Cívica (DPCC)</option>
+              <option>Educación para el Trabajo (EPT)</option><option>Inglés</option>
+              <option>Arte y Cultura</option><option>Educación Física</option><option>Educación Religiosa</option>
+            </select>
+          </div>
+        </div>
         <div id="planCnebPanel" class="cneb-panel"><div class="cneb-title">📋 Competencias CNEB (haz clic para agregar)</div><div id="planCnebCompetencias"></div></div>
         <div class="form-group"><label>Competencias del área</label><textarea id="planCompetencias" style="min-height:70px"></textarea></div>
         <div style="margin-top:1rem;display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
-          <button class="btn btn-primary" onclick="generarDocumento('plan')" style="width:auto">✨ Generar con IA</button>
+          <button class="btn btn-primary" onclick="generarDocumento('plan')" style="width:auto">✨ Generar Planificación con IA</button>
           <button id="btnExportPlan" class="btn btn-success" onclick="exportToWord('planOutput', 'Planificacion_Anual')">📥 Descargar en Word</button>
         </div>
       </div>
@@ -292,10 +346,14 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 </div>
 
 <script>
-// --- ALMACENAMIENTO DE API KEY ---
-let API_KEY = "";
+// =====================================================================
+// 🔑 CONFIGURACIÓN DE IA (OCULTA PARA EL USUARIO FINAL)
+// Reemplaza "TU_API_KEY_AQUI" por tu clave de Google Gemini real.
+// =====================================================================
+const API_KEY = "TU_API_KEY_AQUI"; 
+// =====================================================================
 
-// --- BASE DE DATOS CNEB (Resumida para lectura rápida) ---
+// --- BASE DE DATOS CNEB ---
 const areasCNEB = {
   "Comunicación": [
     { name: "Se comunica oralmente en su lengua materna", caps: ["Obtiene información del texto oral", "Infiere e interpreta información", "Adecúa, organiza y desarrolla", "Utiliza recursos no verbales", "Interactúa estratégicamente", "Reflexiona y evalúa"] },
@@ -304,34 +362,72 @@ const areasCNEB = {
   ],
   "Matemática": [
     { name: "Resuelve problemas de cantidad", caps: ["Traduce cantidades", "Comunica su comprensión", "Usa estrategias", "Argumenta afirmaciones"] },
-    { name: "Resuelve problemas de regularidad, equivalencia y cambio", caps: ["Traduce datos", "Comunica su comprensión", "Usa estrategias", "Argumenta afirmaciones"] }
+    { name: "Resuelve problemas de regularidad, equivalencia y cambio", caps: ["Traduce datos", "Comunica su comprensión", "Usa estrategias", "Argumenta afirmaciones"] },
+    { name: "Resuelve problemas de forma, movimiento y localización", caps: ["Modela objetos con formas", "Comunica su comprensión", "Usa estrategias para medir", "Argumenta afirmaciones"] },
+    { name: "Resuelve problemas de gestión de datos e incertidumbre", caps: ["Representa datos", "Comunica su comprensión", "Usa estrategias para recopilar", "Sustenta conclusiones"] }
   ],
-  "Ciencia y Tecnología": [{ name: "Indaga mediante métodos científicos", caps: ["Problematiza", "Diseña estrategias", "Genera datos", "Analiza datos", "Evalúa"] }],
-  "Ciencias Sociales": [{ name: "Construye interpretaciones históricas", caps: ["Interpreta fuentes", "Comprende el tiempo", "Elabora explicaciones"] }],
-  "Desarrollo Personal, Ciudadanía y Cívica (DPCC)": [{ name: "Construye su identidad", caps: ["Se valora a sí mismo", "Autorregula sus emociones", "Reflexiona éticamente"] }]
+  "Ciencia y Tecnología": [
+    { name: "Indaga mediante métodos científicos", caps: ["Problematiza situaciones", "Diseña estrategias", "Genera y registra datos", "Analiza datos", "Evalúa y comunica"] },
+    { name: "Explica el mundo físico", caps: ["Comprende y usa conocimientos", "Evalúa las implicancias"] },
+    { name: "Diseña y construye soluciones tecnológicas", caps: ["Determina una alternativa", "Diseña la alternativa", "Implementa y valida", "Evalúa y comunica"] }
+  ],
+  "Ciencias Sociales": [
+    { name: "Construye interpretaciones históricas", caps: ["Interpreta fuentes", "Comprende el tiempo", "Elabora explicaciones"] },
+    { name: "Gestiona responsablemente el espacio", caps: ["Comprende las relaciones", "Maneja fuentes", "Genera acciones"] },
+    { name: "Gestiona responsablemente los recursos económicos", caps: ["Comprende las relaciones", "Toma decisiones"] }
+  ],
+  "Desarrollo Personal, Ciudadanía y Cívica (DPCC)": [
+    { name: "Construye su identidad", caps: ["Se valora a sí mismo", "Autorregula sus emociones", "Reflexiona éticamente", "Vive su sexualidad"] },
+    { name: "Convive y participa democráticamente", caps: ["Interactúa con personas", "Construye normas", "Maneja conflictos", "Delibera", "Participa en acciones"] }
+  ],
+  "Educación para el Trabajo (EPT)": [
+    { name: "Gestiona proyectos de emprendimiento", caps: ["Crea propuestas", "Aplica habilidades", "Trabaja cooperativamente", "Evalúa resultados"] }
+  ],
+  "Inglés": [
+    { name: "Se comunica oralmente en inglés", caps: ["Obtiene información", "Infiere e interpreta", "Adecúa y organiza", "Utiliza recursos", "Interactúa", "Reflexiona"] },
+    { name: "Lee diversos tipos de textos en inglés", caps: ["Obtiene información", "Infiere e interpreta", "Reflexiona y evalúa"] },
+    { name: "Escribe diversos tipos de textos en inglés", caps: ["Adecúa el texto", "Organiza ideas", "Utiliza convenciones", "Reflexiona y evalúa"] }
+  ],
+  "Arte y Cultura": [
+    { name: "Aprecia de manera crítica", caps: ["Percibe manifestaciones", "Contextualiza", "Reflexiona"] },
+    { name: "Crea proyectos", caps: ["Explora y experimenta", "Aplica procesos", "Evalúa y comunica"] }
+  ],
+  "Educación Física": [
+    { name: "Se desenvuelve de manera autónoma", caps: ["Comprende su cuerpo", "Se expresa corporalmente"] },
+    { name: "Asume una vida saludable", caps: ["Comprende relaciones", "Incorpora prácticas"] },
+    { name: "Interactúa a través de sus habilidades", caps: ["Se relaciona", "Crea y aplica estrategias"] }
+  ],
+  "Educación Religiosa": [
+    { name: "Construye su identidad como persona...", caps: ["Conoce a Dios", "Cultiva y valora"] },
+    { name: "Asume la experiencia del encuentro...", caps: ["Transforma su entorno", "Actúa coherentemente"] }
+  ]
 };
 
 // --- NAVEGACIÓN ---
 function enterApp(e) {
   if (e) e.preventDefault();
-  API_KEY = document.getElementById('apiKeyValue').value.trim();
+  
   const statusEl = document.getElementById('aiStatus');
-  if(API_KEY) {
-      statusEl.innerHTML = "✨ IA Conectada (API)";
+  if(API_KEY && API_KEY !== "TU_API_KEY_AQUI") {
+      statusEl.innerHTML = "✨ IA Conectada";
       statusEl.style.color = "#5eead4";
   } else {
-      statusEl.innerHTML = "⚠️ Modo Local (Sin API Key)";
+      statusEl.innerHTML = "⚠️ IA Simulada (Falta API Key)";
       statusEl.style.color = "#fcd34d";
   }
+
   document.getElementById('authPage').classList.add('hidden');
   document.getElementById('appShell').classList.remove('hidden');
   onAreaChange('ses'); onAreaChange('uni'); onAreaChange('plan');
 }
+
 function logout() {
   document.getElementById('appShell').classList.add('hidden');
   document.getElementById('authPage').classList.remove('hidden');
 }
+
 function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
 function showPage(pageId, navEl) {
   document.querySelectorAll('.main > div').forEach(el => el.classList.add('hidden'));
   document.getElementById('page-' + pageId).classList.remove('hidden');
@@ -341,6 +437,16 @@ function showPage(pageId, navEl) {
 }
 
 // --- LOGICA DE FORMULARIOS ---
+function showFileName(input, labelId) {
+  const label = document.getElementById(labelId);
+  if (input.files && input.files.length > 0) {
+    label.textContent = "✅ Archivo cargado: " + input.files[0].name;
+    label.style.display = "block";
+  } else {
+    label.style.display = "none";
+  }
+}
+
 function onAreaChange(prefix) {
   const area = document.getElementById(prefix + 'Area').value;
   const comps = areasCNEB[area] || [];
@@ -359,6 +465,7 @@ function selectCompetencia(index) {
   document.getElementById('sesCompetencia').value = index;
   onCompetenciaChange('ses');
 }
+
 function addCompetenciaToTextarea(id, compName) {
   const ta = document.getElementById(id);
   if (!ta.value.includes(compName)) ta.value = ta.value ? ta.value + '\n- ' + compName : '- ' + compName;
@@ -378,14 +485,18 @@ function updateDesempenoAutomatico() {
   if(!compSelect || compSelect.value === '') return;
   const compName = compSelect.options[compSelect.selectedIndex].text;
   const grado = document.getElementById('sesGrado').value;
-  document.getElementById('sesDesempeno').value = `Identifica y aplica estrategias relacionadas a '${compName}', adaptando su proceso a ${grado}, evidenciando análisis crítico.`;
+  let nivelComplejidad = "contenidos de estructura simple";
+  if(grado.includes("3") || grado.includes("4")) nivelComplejidad = "contenidos de estructura compleja y variada";
+  if(grado.includes("5")) nivelComplejidad = "temas especializados con estructuras complejas y posturas críticas";
+
+  document.getElementById('sesDesempeno').value = `Identifica, explica y aplica estrategias clave relacionadas a la competencia '${compName}', adaptando su proceso cognitivo a las exigencias de los estudiantes de ${grado}, evidenciando el análisis y comprensión de ${nivelComplejidad}.`;
 }
 
-// --- CONEXIÓN CON IA (NUEVO MOTOR HÍBRIDO) ---
+// --- CONEXIÓN CON IA ---
 async function fetchIA(prompt) {
-  if (!API_KEY) throw new Error("No hay API Key");
+  // Si no hay API KEY real configurada en el código, lanzamos error para que entre el modo local
+  if (!API_KEY || API_KEY === "TU_API_KEY_AQUI") throw new Error("API Key no configurada");
   
-  // Endpoint de Google Gemini (puedes cambiarlo al de OpenAI si tuvieras tu propio backend)
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
   
   const response = await fetch(url, {
@@ -398,11 +509,10 @@ async function fetchIA(prompt) {
   const data = await response.json();
   let text = data.candidates[0].content.parts[0].text;
   
-  // Limpiamos las etiquetas markdown (```html) que a veces manda la IA
   return text.replace(/```html/gi, '').replace(/```/g, '').trim();
 }
 
-// Generador Unificado (IA con Fallback Local)
+// --- GENERADOR DE DOCUMENTOS ---
 async function generarDocumento(tipo) {
   let prompt = "";
   let outputId = "";
@@ -421,23 +531,19 @@ async function generarDocumento(tipo) {
     
     prompt = `Actúa como un experto docente peruano especializado en el CNEB. Crea una sesión de aprendizaje con los siguientes datos:
     Área: ${area}. Grado: ${grado}. Título: ${titulo}. Competencia: ${comp}. Capacidades: ${caps}. Desempeño precisado: ${des}.
-    Devuelve ÚNICAMENTE código HTML (sin explicaciones ni etiquetas markdown) con esta estructura de tablas:
-    <h2>Datos Informativos</h2> (tabla con área, grado y título)
-    <h2>Propósitos</h2> (tabla con competencia, capacidades y desempeño)
-    <h2>Secuencia Didáctica</h2> (tabla con Inicio, Desarrollo y Cierre detallados y tiempos)
-    <h2>Evaluación</h2> (tabla con criterios e instrumentos).`;
+    Devuelve ÚNICAMENTE código HTML puro sin etiquetas markdown. Estructura con <h2> y <table> para: 1. Datos Informativos, 2. Propósitos, 3. Secuencia Didáctica (Inicio, Desarrollo, Cierre), 4. Evaluación.`;
   }
   else if (tipo === 'unidad') {
     outputId = 'uniOutput'; btnExportId = 'btnExportUni'; statId = 'statUni';
     const area = document.getElementById('uniArea').value;
     const titulo = document.getElementById('uniTitulo').value || "Unidad Didáctica";
     const comp = document.getElementById('uniCompetencias').value;
-    prompt = `Actúa como experto CNEB. Crea una Unidad Didáctica en HTML puro usando tablas para el área de ${area}, Título: "${titulo}", Competencias: ${comp}. Incluye: Datos, Propósito, Situación Significativa y Secuencia de Sesiones (4 sesiones en tabla). Solo HTML.`;
+    prompt = `Actúa como experto CNEB. Crea una Unidad Didáctica en HTML puro usando tablas para el área de ${area}, Título: "${titulo}", Competencias: ${comp}. Incluye: Datos, Propósito, Situación Significativa y Secuencia de Sesiones (4 sesiones en tabla). Solo HTML sin markdown.`;
   }
   else if (tipo === 'plan') {
     outputId = 'planOutput'; btnExportId = 'btnExportPlan'; statId = 'statPlan';
     const area = document.getElementById('planArea').value;
-    prompt = `Crea un Plan Anual CNEB en HTML puro usando tablas para el área de ${area}. Incluye: Datos generales, Enfoques transversales, y Organización de las Unidades (4 bimestres en tabla). Solo HTML.`;
+    prompt = `Crea un Plan Anual CNEB en HTML puro usando tablas para el área de ${area}. Incluye: Datos generales, Enfoques transversales, y Organización de las Unidades (4 bimestres en tabla). Solo HTML sin markdown.`;
   }
 
   const output = document.getElementById(outputId);
@@ -446,39 +552,38 @@ async function generarDocumento(tipo) {
   output.innerHTML = '<div class="gen-loading"><div class="loading"></div>Conectando con la IA y estructurando documento...</div>';
 
   try {
-    // 1. INTENTAMOS CONECTAR CON LA IA
     const htmlGeneradoIA = await fetchIA(prompt);
     output.innerHTML = `<div class="output-rendered">${htmlGeneradoIA}</div>`;
   } catch (error) {
-    // 2. SI FALLA (Sin internet, sin API Key o error de servidor), USAMOS EL MOTOR LOCAL DE EMERGENCIA
-    console.warn("Error con IA, activando motor local:", error);
-    output.innerHTML = `<div class="gen-loading" style="background:#fffbeb; color:#d97706; border:1px solid #fde68a;">⚠️ No se pudo conectar a la IA. Generando plantilla local de emergencia...</div>`;
+    console.warn("Fallo de API o no configurada, activando simulación local.");
     
     setTimeout(() => {
       let htmlLocal = "";
       if (tipo === 'sesion') {
-        htmlLocal = `<h2>Datos Informativos</h2><table><tr><th>Área</th><td>${document.getElementById('sesArea').value}</td><th>Grado</th><td>${document.getElementById('sesGrado').value}</td></tr></table>
-        <h2>Propósitos</h2><table><tr><th>Competencia</th><td>${document.getElementById('sesCompetencia').options[document.getElementById('sesCompetencia').selectedIndex]?.text}</td></tr><tr><th>Desempeño</th><td>${document.getElementById('sesDesempeno').value}</td></tr></table>
-        <h2>Secuencia Didáctica</h2><table><tr><th>INICIO</th><td>Motivación y saberes previos.</td><td>15m</td></tr><tr><th>DESARROLLO</th><td>Acompañamiento docente.</td><td>60m</td></tr><tr><th>CIERRE</th><td>Metacognición.</td><td>15m</td></tr></table>`;
+        htmlLocal = `<h2>1. Datos Informativos</h2><table><tr><th>Área</th><td>${document.getElementById('sesArea').value}</td><th>Grado</th><td>${document.getElementById('sesGrado').value}</td></tr><tr><th>Título</th><td colspan="3">${document.getElementById('sesTitulo').value || 'Sesión'}</td></tr></table>
+        <h2>2. Propósitos de Aprendizaje</h2><table><tr><th>Competencia</th><td>${document.getElementById('sesCompetencia').options[document.getElementById('sesCompetencia').selectedIndex]?.text || ''}</td></tr><tr><th>Desempeño</th><td>${document.getElementById('sesDesempeno').value}</td></tr></table>
+        <h2>3. Secuencia Didáctica</h2><table><tr><th>Momentos</th><th>Actividades</th><th>Tiempo</th></tr><tr><td><strong>INICIO</strong></td><td><ul><li>Motivación y problematización.</li><li>Recojo de saberes previos.</li></ul></td><td>15 min</td></tr><tr><td><strong>DESARROLLO</strong></td><td><ul><li>Gestión y acompañamiento.</li><li>Aplicación de estrategias.</li></ul></td><td>60 min</td></tr><tr><td><strong>CIERRE</strong></td><td><ul><li>Metacognición y evaluación.</li></ul></td><td>15 min</td></tr></table>`;
+      } else if (tipo === 'unidad') {
+         htmlLocal = `<h2>Datos de la Unidad</h2><table><tr><th>Área</th><td>${document.getElementById('uniArea').value}</td><th>Título</th><td>${document.getElementById('uniTitulo').value || 'Unidad'}</td></tr></table><h2>Secuencia de Sesiones</h2><table><tr><th>Sesión 1</th><td>Introducción al tema.</td></tr><tr><th>Sesión 2</th><td>Desarrollo práctico.</td></tr><tr><th>Sesión 3</th><td>Aplicación de conocimientos.</td></tr><tr><th>Sesión 4</th><td>Evaluación final.</td></tr></table>`;
       } else {
-         htmlLocal = `<h2>Documento Generado (Modo Offline)</h2><p>Por favor, revisa tu conexión a internet o tu API Key para generar el documento detallado completo.</p>`;
+         htmlLocal = `<h2>Planificación Anual - ${document.getElementById('planArea').value}</h2><table><tr><th>Bimestre</th><th>Organización</th><th>Duración</th></tr><tr><td>I Bimestre</td><td>Evaluación diagnóstica y nivelación</td><td>9 semanas</td></tr><tr><td>II Bimestre</td><td>Profundización y análisis crítico</td><td>9 semanas</td></tr><tr><td>III Bimestre</td><td>Proyectos colaborativos</td><td>9 semanas</td></tr><tr><td>IV Bimestre</td><td>Evaluación sumativa</td><td>9 semanas</td></tr></table>`;
       }
       output.innerHTML = `<div class="output-rendered">${htmlLocal}</div>`;
-    }, 1000);
+    }, 1200);
   }
 
-  // Finalizamos UI
   setTimeout(() => {
       btnExport.style.display = 'inline-flex';
       document.getElementById(statId).innerText = parseInt(document.getElementById(statId).innerText) + 1;
       output.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 1100);
+  }, 1300);
 }
 
 // --- CHAT IA ---
 function scrollToBottomChat() {
   const c = document.getElementById('chatMessages'); c.scrollTop = c.scrollHeight;
 }
+
 async function enviarChatIA() {
   const input = document.getElementById('chatInput');
   const text = input.value.trim();
@@ -499,18 +604,19 @@ async function enviarChatIA() {
     container.innerHTML += `<div class="chat-msg ai"><div class="chat-avatar">🤖</div><div class="chat-bubble ai-bubble">${respuestaIA}</div></div>`;
   } catch (error) {
     document.getElementById(typingId).remove();
-    container.innerHTML += `<div class="chat-msg ai"><div class="chat-avatar">🤖</div><div class="chat-bubble ai-bubble" style="background:#fee2e2; color:#b91c1c;">Error: No pude conectar con el cerebro de la IA. Revisa tu conexión o tu API Key.</div></div>`;
+    const respSimulada = `Esta es una respuesta simulada a tu consulta: "<em>${text}</em>". Recuerda reemplazar la variable API_KEY en el código para activar mi conexión real.`;
+    container.innerHTML += `<div class="chat-msg ai"><div class="chat-avatar">🤖</div><div class="chat-bubble ai-bubble">${respSimulada}</div></div>`;
   }
   scrollToBottomChat();
 }
 
-// --- EXPORTAR A WORD (CSS Compacto) ---
+// --- EXPORTAR A WORD ---
 function exportToWord(elementId, filename) {
   const contentEl = document.getElementById(elementId).querySelector('.output-rendered');
   if (!contentEl) return alert("No hay documento generado para exportar.");
-  let rawHTML = contentEl.innerHTML.trim();
+  let rawHTML = contentEl.innerHTML.replace(/```html/gi, '').replace(/```/g, '').trim();
   const styles = `<style>body{font-family:'Arial',sans-serif;line-height:1.15;color:#000;font-size:11pt;} h2{font-size:13pt;color:#0056b3;border-bottom:1px solid #a0cffc;margin-top:12px;margin-bottom:6px;} table{width:100%;border-collapse:collapse;margin-top:5px;margin-bottom:10px;font-size:10.5pt;} table,th,td{border:1px solid #666;} th,td{padding:4px 6px;text-align:left;vertical-align:top;} th{background-color:#e9f5ff;font-weight:bold;color:#004085;} ul{margin-left:20px;padding-left:0;margin-top:3px;margin-bottom:3px;} li{margin-bottom:2px;} p{margin-top:2px;margin-bottom:6px;}</style>`;
-  const html = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='[http://www.w3.org/TR/REC-html40](http://www.w3.org/TR/REC-html40)'><head><meta charset='utf-8'>" + styles + "</head><body>" + rawHTML + "</body></html>";
+  const html = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'>" + styles + "</head><body>" + rawHTML + "</body></html>";
   const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
