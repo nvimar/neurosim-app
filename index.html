@@ -492,27 +492,28 @@ async function readFileWord(inputId) {
   });
 }
 
-// ====== LÓGICA PARA EXPORTAR A WORD (SÚPER COMPACTO SIN PÁRRAFOS EN LAS VIÑETAS) ======
+// ====== LÓGICA PARA EXPORTAR A WORD ======
 function exportToWord(elementId, filename) {
   const contentEl = document.getElementById(elementId).querySelector('.output-rendered');
   if (!contentEl) return alert("No hay documento generado para exportar.");
 
-  // Limpieza NIVEL DIOS: Destruimos las etiquetas <p> que la IA mete dentro de las viñetas y eliminamos CSS generado
+  // Limpieza NIVEL DIOS V2: Compresión máxima, destrucción total de <p> y espacios ocultos
   let rawHTML = contentEl.innerHTML
-      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '') // Destruye estilos previos
+      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '') 
       .replace(/```html/gi, '')
       .replace(/```css/gi, '')
       .replace(/```/g, '')
       .replace(/<p[^>]*>/gi, '') // Elimina la apertura de los párrafos
-      .replace(/<\/p>/gi, '<br>') // Convierte el cierre de párrafo en un salto simple
-      .replace(/(<br\s*\/?>\s*)+<\/li>/gi, '</li>') // Elimina saltos de línea al FINAL de una viñeta
-      .replace(/<li>\s*(<br\s*\/?>\s*)+/gi, '<li>') // Elimina saltos de línea al INICIO de una viñeta
-      .replace(/(<br\s*\/?>\s*)+<\/td>/gi, '</td>') // Elimina saltos de línea al FINAL de una celda
-      .replace(/<td>\s*(<br\s*\/?>\s*)+/gi, '<td>') // Elimina saltos de línea al INICIO de una celda
-      .replace(/(<br\s*\/?>[\s\n\r]*){2,}/gi, '<br>') // Evita múltiples saltos de línea seguidos
+      .replace(/<\/p>/gi, '') // DESTRUYE los cierres de párrafo (ya no los convierte en br)
+      .replace(/(<br\s*\/?>\s*)+<\/li>/gi, '</li>') 
+      .replace(/<li>\s*(<br\s*\/?>\s*)+/gi, '<li>') 
+      .replace(/(<br\s*\/?>\s*)+<\/td>/gi, '</td>') 
+      .replace(/<td>\s*(<br\s*\/?>\s*)+/gi, '<td>') 
+      .replace(/(<br\s*\/?>[\s\n\r]*){2,}/gi, '<br>') 
+      .replace(/>\s+</g, '><') // COMPRESIÓN MÁXIMA: elimina saltos de línea del propio código fuente HTML
       .trim();
 
-  // CSS inyectado estrictamente para Microsoft Word, forzando márgenes a CERO
+  // CSS inyectado estrictamente para Microsoft Word
   const styles = `
     <style>
       @page { margin: 1cm; mso-page-orientation: portrait; }
@@ -522,30 +523,33 @@ function exportToWord(elementId, filename) {
       h1 { font-size: 12pt; text-align: center; border-bottom: 1.5pt solid #0056b3; padding-bottom: 2pt; }
       h2 { font-size: 11pt; border-bottom: 1px solid #a0cffc; background: #f8fbff; }
       h3 { font-size: 10pt; color: #007bff; }
-      table { width: 100%; border-collapse: collapse; margin: 2pt 0 4pt 0; font-size: 9pt; }
+      
+      /* TABLAS ESTRICTAS: Sin espacios, ni padding grande */
+      table { width: 100%; border-collapse: collapse; margin: 2pt 0; font-size: 9pt; mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
       table, th, td { border: 1px solid #000; }
-      th, td { padding: 3px 4px; text-align: left; vertical-align: top; }
+      th, td { padding: 1px 2px; text-align: left; vertical-align: top; mso-line-height-rule: exactly; line-height: 1.0; } /* Padding minimizado al extremo */
       tr { page-break-inside: avoid; }
       th { background-color: #e9f5ff; font-weight: bold; color: #004085; }
       
       /* REGLAS ESTRICTAS PARA VIÑETAS EN WORD */
-      ul, ol { margin-top: 0cm; margin-bottom: 0cm; padding-left: 15px; }
+      ul, ol { margin: 0; padding-left: 12px; } /* Menos sangría */
       li { 
-        margin-top: 0cm; 
-        margin-bottom: 0cm; 
+        margin: 0; 
         mso-margin-top-alt: 0; 
         mso-margin-bottom-alt: 0; 
+        mso-space-before: 0;
+        mso-space-after: 0;
       }
       p, div, span { 
         margin: 0; 
         mso-margin-top-alt: 0; 
         mso-margin-bottom-alt: 0; 
+        mso-space-before: 0;
+        mso-space-after: 0;
       }
       
       .signature-line { margin-top: 25px; text-align: center; display: flex; justify-content: space-around; width: 100%; }
       .signature-line div { width: 30%; border-top: 1px solid #000; padding-top: 2px; font-size: 9pt; }
-      .matrix-table th, .matrix-table td { text-align: center; }
-      .matrix-table th:first-child, .matrix-table td:first-child { text-align: left; }
     </style>
   `;
 
