@@ -347,7 +347,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 </div>
 
 <script>
-// --- ÁREAS, COMPETENCIAS Y CAPACIDADES CNEB SECUNDARIA COMPLETAS ---
+// --- ÁREAS, COMPETENCIAS Y CAPACIDADES CNEB ---
 const areasCNEB = {
   "Comunicación": [
     { name: "Se comunica oralmente en su lengua materna", caps: ["Obtiene información del texto oral", "Infiere e interpreta información del texto oral", "Adecúa, organiza y desarrolla las ideas de forma coherente y cohesionada", "Utiliza recursos no verbales y paraverbales de forma estratégica", "Interactúa estratégicamente con distintos interlocutores", "Reflexiona y evalúa la forma, el contenido y contexto del texto oral"] },
@@ -451,6 +451,7 @@ function onCompetenciaChange(prefix) {
   if (prefix === 'ses') updateDesempenoAutomatico();
 }
 
+// CAPACIDADES CON VIÑETA DE TEXTO (Para que jamás use <ul><li>)
 function updateDesempenoAutomatico() {
   const compSelect = document.getElementById('sesCompetencia');
   if(!compSelect || compSelect.value === '') return;
@@ -465,7 +466,6 @@ function updateDesempenoAutomatico() {
   document.getElementById('sesDesempeno').value = `Identifica, explica y aplica estrategias clave relacionadas a la competencia '${competenciaName}', adaptando su proceso cognitivo a las exigencias de los estudiantes de ${grado}, evidenciando el análisis y comprensión de ${nivelComplejidad}.`;
 }
 
-// ====== LÓGICA PARA LEER WORD (.docx) ======
 function showFileName(input, labelId) {
   const label = document.getElementById(labelId);
   if (input.files && input.files.length > 0) {
@@ -492,28 +492,31 @@ async function readFileWord(inputId) {
   });
 }
 
-// ====== LÓGICA PARA EXPORTAR A WORD ======
+// ====== EXPORTACIÓN A WORD (CERO NIVELES, CERO SANGRÍAS) ======
 function exportToWord(elementId, filename) {
   const contentEl = document.getElementById(elementId).querySelector('.output-rendered');
   if (!contentEl) return alert("No hay documento generado para exportar.");
 
-  // Limpieza NIVEL DIOS V2: Compresión máxima, destrucción total de <p> y espacios ocultos
+  // LA MAGIA: Destruimos absolutamente todas las listas HTML y las volvemos texto plano con <br>
   let rawHTML = contentEl.innerHTML
       .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '') 
       .replace(/```html/gi, '')
       .replace(/```css/gi, '')
       .replace(/```/g, '')
-      .replace(/<p[^>]*>/gi, '') // Elimina la apertura de los párrafos
-      .replace(/<\/p>/gi, '') // DESTRUYE los cierres de párrafo (ya no los convierte en br)
-      .replace(/(<br\s*\/?>\s*)+<\/li>/gi, '</li>') 
-      .replace(/<li>\s*(<br\s*\/?>\s*)+/gi, '<li>') 
+      .replace(/<p[^>]*>/gi, '') 
+      .replace(/<\/p>/gi, '') 
+      .replace(/<ul[^>]*>/gi, '') // Destruye etiqueta UL
+      .replace(/<\/ul>/gi, '')
+      .replace(/<ol[^>]*>/gi, '') // Destruye etiqueta OL
+      .replace(/<\/ol>/gi, '')
+      .replace(/<li[^>]*>\s*/gi, '• ') // Convierte el inicio del LI en un punto literal (texto)
+      .replace(/\s*<\/li>/gi, '<br>') // Convierte el fin del LI en un salto de línea simple
       .replace(/(<br\s*\/?>\s*)+<\/td>/gi, '</td>') 
       .replace(/<td>\s*(<br\s*\/?>\s*)+/gi, '<td>') 
       .replace(/(<br\s*\/?>[\s\n\r]*){2,}/gi, '<br>') 
-      .replace(/>\s+</g, '><') // COMPRESIÓN MÁXIMA: elimina saltos de línea del propio código fuente HTML
+      .replace(/>\s+</g, '><') // Elimina TODO espacio en blanco fantasma del HTML
       .trim();
 
-  // CSS inyectado estrictamente para Microsoft Word
   const styles = `
     <style>
       @page { margin: 1cm; mso-page-orientation: portrait; }
@@ -524,29 +527,15 @@ function exportToWord(elementId, filename) {
       h2 { font-size: 11pt; border-bottom: 1px solid #a0cffc; background: #f8fbff; }
       h3 { font-size: 10pt; color: #007bff; }
       
-      /* TABLAS ESTRICTAS: Sin espacios, ni padding grande */
-      table { width: 100%; border-collapse: collapse; margin: 2pt 0; font-size: 9pt; mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+      /* TABLAS ESTRICTAS: Sin padding casi, abrazando al texto */
+      table { width: 100%; border-collapse: collapse; margin: 2pt 0 4pt 0; font-size: 9pt; mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
       table, th, td { border: 1px solid #000; }
-      th, td { padding: 1px 2px; text-align: left; vertical-align: top; mso-line-height-rule: exactly; line-height: 1.0; } /* Padding minimizado al extremo */
+      th, td { padding: 1px 2px; text-align: left; vertical-align: top; mso-line-height-rule: exactly; line-height: 1.0; }
       tr { page-break-inside: avoid; }
       th { background-color: #e9f5ff; font-weight: bold; color: #004085; }
       
-      /* REGLAS ESTRICTAS PARA VIÑETAS EN WORD */
-      ul, ol { margin: 0; padding-left: 12px; } /* Menos sangría */
-      li { 
-        margin: 0; 
-        mso-margin-top-alt: 0; 
-        mso-margin-bottom-alt: 0; 
-        mso-space-before: 0;
-        mso-space-after: 0;
-      }
-      p, div, span { 
-        margin: 0; 
-        mso-margin-top-alt: 0; 
-        mso-margin-bottom-alt: 0; 
-        mso-space-before: 0;
-        mso-space-after: 0;
-      }
+      /* ELIMINACIÓN DE SANGRÍAS POR DEFECTO */
+      p, div, span { margin: 0; mso-margin-top-alt: 0; mso-margin-bottom-alt: 0; mso-space-before: 0; mso-space-after: 0; }
       
       .signature-line { margin-top: 25px; text-align: center; display: flex; justify-content: space-around; width: 100%; }
       .signature-line div { width: 30%; border-top: 1px solid #000; padding-top: 2px; font-size: 9pt; }
@@ -573,7 +562,7 @@ function exportToWord(elementId, filename) {
   document.body.removeChild(downloadLink);
 }
 
-// ====== LLAMADAS A TU API EN VERCEL ======
+// ====== LLAMADAS A VERCEL ======
 async function callIA(prompt, outputId, btnExportId) {
   const output = document.getElementById(outputId);
   const btnExport = document.getElementById(btnExportId);
@@ -590,7 +579,6 @@ async function callIA(prompt, outputId, btnExportId) {
     const data = await res.json();
     if (data.error) throw new Error(data.error);
     
-    // Limpieza de bloques de código en la visualización web
     let cleanResponse = data.respuesta
       .replace(/```html/gi, '')
       .replace(/```css/gi, '')
@@ -606,7 +594,7 @@ async function callIA(prompt, outputId, btnExportId) {
   }
 }
 
-// ====== GENERACIÓN DE SESIÓN CON PLANTILLA ESTRICTA ======
+// ====== GENERACIÓN DE SESIÓN RESTRINGIDA ======
 async function generarSesionIA() {
   const titulo = document.getElementById('sesTitulo').value || "Tema Libre";
   const area = document.getElementById('sesArea').value;
@@ -615,20 +603,22 @@ async function generarSesionIA() {
   const competencia = compSelect.options[compSelect.selectedIndex]?.text || "No especificada";
   const desempeño = document.getElementById('sesDesempeno').value || "No especificado";
   
+  // Transformamos las capacidades seleccionadas DIRECTO en texto con salto de línea (Sin UL ni LI)
   const capNodes = document.querySelectorAll('#sesCapacidades input:checked');
-  let capacidades = Array.from(capNodes).map(n => `<li>${n.parentNode.textContent.trim()}</li>`).join('');
-  if(!capacidades) capacidades = "<li>No especificadas</li>";
+  let capacidades = Array.from(capNodes).map(n => `• ${n.parentNode.textContent.trim()}`).join('<br>');
+  if(!capacidades) capacidades = "• No especificadas";
 
   let templateText = await readFileWord('sesFile');
-  let formatInstruccion = templateText ? `Considera el contenido de esta plantilla subida: \n${templateText}` : "";
+  let formatInstruccion = templateText ? `Considera esta plantilla base: \n${templateText}` : "";
 
-  // Prompt con ESTRUCTURA LITERAL OBLIGATORIA. Esto asegura que la IA no invente diseños.
+  // Prompt BLINDADO: Se le prohíbe a la IA usar listas HTML.
   const prompt = `Actúa como experto MINEDU Perú. Desarrolla una Sesión de Aprendizaje.
 ${formatInstruccion}
 
 REGLA DE ORO: TIENES PROHIBIDO INVENTAR HTML O ETIQUETAS <style>.
-Debes devolver EXACTAMENTE ESTA PLANTILLA HTML copiándola tal cual y rellenando la información requerida en su interior con contenido de alto valor pedagógico. 
-IMPORTANTE: Dentro de las tablas usa SOLO etiquetas <ul> y <li>. NO uses etiquetas <p> dentro de las tablas ni de las listas.
+NO USES ETIQUETAS <ul>, <ol>, <li> NI <p>. Usa el símbolo "•" para viñetas y la etiqueta "<br>" para saltar de línea.
+
+Debes devolver EXACTAMENTE ESTA PLANTILLA HTML copiándola tal cual y rellenando la información requerida en su interior:
 
 <h2>1. Datos Informativos</h2>
 <table>
@@ -639,15 +629,15 @@ IMPORTANTE: Dentro de las tablas usa SOLO etiquetas <ul> y <li>. NO uses etiquet
 <h2>2. Propósitos de Aprendizaje</h2>
 <table>
   <tr><th>Competencia</th><th>Capacidades</th><th>Desempeño Precisado</th></tr>
-  <tr><td><strong>${competencia}</strong></td><td><ul>${capacidades}</ul></td><td>${desempeño}</td></tr>
+  <tr><td><strong>${competencia}</strong></td><td>${capacidades}</td><td>${desempeño}</td></tr>
 </table>
 
 <h2>3. Secuencia Didáctica</h2>
 <table>
-  <tr><th style="width:15%">Momentos</th><th>Actividades / Estrategias (Se muy detallado pero usa SOLO viñetas <ul><li> sin etiquetas <p> dentro)</th><th style="width:15%">Tiempo</th></tr>
-  <tr><td><strong>INICIO</strong></td><td><ul><li>[Aquí redacta estrategia 1]</li><li>[Estrategia 2]</li></ul></td><td>15 min</td></tr>
-  <tr><td><strong>DESARROLLO</strong></td><td><ul><li>[Aquí redacta estrategia 1]</li><li>[Estrategia 2]</li></ul></td><td>60 min</td></tr>
-  <tr><td><strong>CIERRE</strong></td><td><ul><li>[Aquí redacta estrategia 1]</li><li>[Estrategia 2]</li></ul></td><td>15 min</td></tr>
+  <tr><th style="width:15%">Momentos</th><th>Actividades / Estrategias (Usa el símbolo "•" para viñetas y <br> para separar. PROHIBIDO USAR <ul> O <li>)</th><th style="width:15%">Tiempo</th></tr>
+  <tr><td><strong>INICIO</strong></td><td>• [Aquí redacta estrategia 1]<br>• [Estrategia 2]</td><td>15 min</td></tr>
+  <tr><td><strong>DESARROLLO</strong></td><td>• [Aquí redacta estrategia 1]<br>• [Estrategia 2]</td><td>60 min</td></tr>
+  <tr><td><strong>CIERRE</strong></td><td>• [Aquí redacta estrategia 1]<br>• [Estrategia 2]</td><td>15 min</td></tr>
 </table>
 
 <div class="signature-line"><div>DOCENTE</div><div>COORDINADOR</div><div>DIRECTOR(A)</div></div>
@@ -673,7 +663,7 @@ async function generarUnidadIA() {
   let formatInstruccion = templateText ? `\n\nADAPTA TU RESPUESTA A ESTA PLANTILLA:\n${templateText}` : "";
 
   const prompt = `Actúa como experto MINEDU Perú. Crea una Unidad Didáctica. Tema: ${titulo}. Área: ${area}. 
-  DEVUELVE SOLO HTML PURO estructurado en Tablas. NO INCLUYAS ETIQUETAS <style>. ${formatInstruccion}`;
+  DEVUELVE SOLO HTML PURO estructurado en Tablas. NO INCLUYAS ETIQUETAS <style>. NO USES <ul> NI <li>, usa viñetas "•" y <br>. ${formatInstruccion}`;
   await callIA(prompt, 'uniOutput', 'btnExportUni');
 }
 
@@ -683,11 +673,11 @@ async function generarPlanAnualIA() {
   let formatInstruccion = templateText ? `\n\nADAPTA TU RESPUESTA A ESTA PLANTILLA:\n${templateText}` : "";
 
   const prompt = `Actúa como experto MINEDU Perú. Crea un Plan Anual para ${area}. 
-  DEVUELVE SOLO HTML PURO estructurado en Tablas. NO INCLUYAS ETIQUETAS <style>. ${formatInstruccion}`;
+  DEVUELVE SOLO HTML PURO estructurado en Tablas. NO INCLUYAS ETIQUETAS <style>. NO USES <ul> NI <li>, usa viñetas "•" y <br>. ${formatInstruccion}`;
   await callIA(prompt, 'planOutput', 'btnExportPlan');
 }
 
-// ====== LÓGICA DEL CHAT CON LA API EN VERCEL ======
+// ====== CHAT ======
 function scrollToBottomChat() {
   const container = document.getElementById('chatMessages');
   container.scrollTop = container.scrollHeight;
