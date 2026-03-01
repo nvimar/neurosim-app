@@ -40,12 +40,8 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 .btn-outline:hover{background:var(--secondary)}
 .btn-success{background:#10b981;color:#fff;width:auto;margin-top:1rem;display:none}
 .btn-success:hover{background:#059669}
-.btn-sm{padding:.45rem 1rem;font-size:.8rem}
-.link-btn{background:none;border:none;color:var(--primary);font-size:.8rem;font-weight:500}
-.link-btn:hover{text-decoration:underline}
 .divider{display:flex;align-items:center;gap:.8rem;margin:1rem 0;color:var(--muted);font-size:.75rem;text-transform:uppercase}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
-.text-muted{color:var(--muted);font-size:.82rem;text-align:center;margin-top:1rem}
 
 /* Layout */
 .app{display:flex;min-height:100vh}
@@ -83,9 +79,8 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 .form-group textarea{width:100%;padding:.6rem .8rem;border:1px solid var(--border);border-radius:8px;outline:none;resize:vertical;min-height:80px}
 .form-group textarea:focus{border-color:var(--primary)}
 
-/* Zona de carga de archivos */
-.file-drop{border:2px dashed var(--border);border-radius:var(--radius);padding:1.5rem;text-align:center;color:var(--muted);font-size:.85rem;cursor:pointer;transition:border .2s;margin-top:.5rem;background:#faf9f6}
-.file-drop:hover{border-color:var(--primary);background:var(--secondary);color:var(--sec-fg)}
+.file-drop{border:2px dashed var(--border);border-radius:var(--radius);padding:1.5rem;text-align:center;color:var(--muted);font-size:.85rem;cursor:pointer;transition:all .2s ease;margin-top:.5rem;background:#faf9f6}
+.file-drop:hover, .file-drop.dragover{border-color:var(--primary);background:var(--secondary);color:var(--sec-fg)}
 .file-drop input{display:none}
 .file-name-label{display:none;color:var(--primary);font-size:0.8rem;font-weight:600;margin-top:0.4rem;text-align:center}
 
@@ -95,28 +90,24 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 .cneb-tag{display:inline-block;background:var(--primary);color:#fff;border-radius:20px;padding:.15rem .6rem;font-size:.72rem;font-weight:600;margin:.15rem .1rem;cursor:pointer;transition:opacity .15s}
 .cneb-tag:hover{opacity:.8}
 
-/* Output - rendered HTML */
-.output-rendered{background:#fff;border:1px solid #a7f3d0;border-radius:var(--radius);padding:1.5rem 2rem;margin-top:1rem;font-size:.9rem;line-height:1.8;max-height:600px;overflow-y:auto;scroll-behavior:smooth;}
+/* Output - rendered HTML (Solo visualización en Web) */
+.output-rendered{background:#fff;border:1px solid #a7f3d0;border-radius:var(--radius);padding:1.5rem 2rem;margin-top:1rem;font-size:.9rem;line-height:1.6;max-height:600px;overflow-y:auto;scroll-behavior:smooth;}
 .output-rendered h2{color:var(--primary);font-size:1rem;font-weight:700;border-bottom:2px solid var(--secondary);padding-bottom:.3rem;margin:1.2rem 0 .5rem}
-.output-rendered h3{color:var(--fg);font-size:.9rem;font-weight:700;margin:.8rem 0 .3rem}
 .output-rendered table{width:100%;border-collapse:collapse;font-size:.82rem;margin:.5rem 0}
 .output-rendered th{background:var(--primary);color:#fff;padding:.5rem .7rem;text-align:left;font-weight:600}
 .output-rendered td{border:1px solid var(--border);padding:.5rem .7rem;vertical-align:top}
 .output-rendered tr:nth-child(even) td{background:#f8fffe}
 .output-rendered ul{padding-left:1.2rem;margin:.3rem 0}
 .output-rendered li{margin:.2rem 0}
+.output-rendered .signature-line {margin-top: 30px; text-align: center; display: flex; justify-content: space-around; padding-top: 20px;}
+.output-rendered .signature-line div {width: 30%; border-top: 1px solid #333; padding-top: 8px; font-size: 0.9em;}
 
 /* Loading animation */
 .loading{display:inline-block;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .gen-loading{display:flex;align-items:center;gap:.8rem;padding:1.5rem;background:var(--secondary);border-radius:var(--radius);font-size:.9rem;color:var(--sec-fg);font-weight:600;margin-top:1rem}
 
-/* Tabs */
-.tabs{display:flex;gap:.3rem;border-bottom:2px solid var(--border);margin-bottom:1.2rem}
-.tab{padding:.5rem 1rem;font-size:.85rem;font-weight:600;border:none;background:none;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer}
-.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
-
-/* Mobile */
+/* Mobile & Chat */
 .menu-toggle{display:none;position:fixed;top:.8rem;left:.8rem;z-index:60;background:var(--primary);color:#fff;border:none;border-radius:8px;width:40px;height:40px;font-size:1.2rem}
 @media(max-width:768px){
   .sidebar{transform:translateX(-100%)}
@@ -125,9 +116,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
   .menu-toggle{display:flex;align-items:center;justify-content:center}
 }
 .hidden{display:none!important}
-
-/* Chat */
-.chat-msg{display:flex;gap:.5rem;align-items:flex-start}
+.chat-msg{display:flex;gap:.5rem;align-items:flex-start;margin-bottom:1rem;}
 .chat-msg.user{flex-direction:row-reverse}
 .chat-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
 .chat-msg.ai .chat-avatar{background:var(--primary);color:#fff}
@@ -208,8 +197,12 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
         
         <div class="form-group">
           <label>Plantilla o Formato Base (Word)</label>
-          <div class="file-drop" onclick="document.getElementById('sesFile').click()">
-            📄 Haz clic para subir tu formato base (.docx) aquí.
+          <div class="file-drop" 
+               onclick="document.getElementById('sesFile').click()"
+               ondragover="event.preventDefault(); this.classList.add('dragover')"
+               ondragleave="this.classList.remove('dragover')"
+               ondrop="event.preventDefault(); this.classList.remove('dragover'); const inp=document.getElementById('sesFile'); inp.files=event.dataTransfer.files; showFileName(inp, 'sesFileName')">
+            📄 Haz clic o arrastra tu formato base (.docx) aquí.
             <input type="file" id="sesFile" accept=".docx" onchange="showFileName(this, 'sesFileName')">
           </div>
           <div id="sesFileName" class="file-name-label"></div>
@@ -266,7 +259,6 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
       <h1>📚 Unidad Didáctica</h1>
       <div class="card">
         <h3>Datos de la unidad</h3>
-
         <div class="form-group">
           <label>Plantilla o Formato Base (Word)</label>
           <div class="file-drop" onclick="document.getElementById('uniFile').click()">
@@ -305,7 +297,6 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
       <h1>📅 Planificación Curricular Anual</h1>
       <div class="card">
         <h3>Datos generales</h3>
-
         <div class="form-group">
           <label>Plantilla o Formato Base (Word)</label>
           <div class="file-drop" onclick="document.getElementById('planFile').click()">
@@ -354,7 +345,12 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 </div>
 
 <script>
-// --- ÁREAS, COMPETENCIAS Y CAPACIDADES CNEB SECUNDARIA COMPLETAS ---
+// =====================================================================
+// 🔑 CONFIGURACIÓN DE IA EN VERCEL
+// El sistema se conecta a tu API en Vercel para mayor seguridad.
+// =====================================================================
+
+// --- ÁREAS, COMPETENCIAS Y CAPACIDADES CNEB ---
 const areasCNEB = {
   "Comunicación": [
     { name: "Se comunica oralmente en su lengua materna", caps: ["Obtiene información del texto oral", "Infiere e interpreta información del texto oral", "Adecúa, organiza y desarrolla las ideas de forma coherente y cohesionada", "Utiliza recursos no verbales y paraverbales de forma estratégica", "Interactúa estratégicamente con distintos interlocutores", "Reflexiona y evalúa la forma, el contenido y contexto del texto oral"] },
@@ -500,7 +496,7 @@ async function readFileWord(inputId) {
   });
 }
 
-// ====== LÓGICA PARA EXPORTAR A WORD (SÚPER COMPACTO Y LIMPIO) ======
+// ====== LÓGICA PARA EXPORTAR A WORD (SÚPER COMPACTO Y CON TU ESQUEMA) ======
 function exportToWord(elementId, filename) {
   const contentEl = document.getElementById(elementId).querySelector('.output-rendered');
   if (!contentEl) return alert("No hay documento generado para exportar.");
@@ -516,40 +512,35 @@ function exportToWord(elementId, filename) {
       .replace(/ margin-top: [^;]+;/gi, '')
       .trim();
 
-  // Inyectar el CSS exacto para forzar a MS Word a ser compacto
+  // Tu CSS exacto para mantener el esquema de colores, adaptado para ser súper compacto en MS Word
   const styles = `
     <style>
-      @page {
-          margin: 1.5cm 1.5cm 1.5cm 1.5cm; /* Márgenes de hoja estrechos */
-          mso-page-orientation: portrait;
-      }
-      body { 
-          font-family: 'Arial', sans-serif; 
-          line-height: 1.0; /* Interlineado muy corto */
-          color: #000; 
-          margin: 0; 
-          padding: 0; 
-          font-size: 10.5pt; /* Tamaño óptimo para ahorrar espacio */
-      }
-      h1, h2, h3, h4 { color: #0056b3; margin: 8pt 0 4pt 0; padding: 0; line-height: 1.2; }
-      h1 { font-size: 14pt; text-align: center; border-bottom: 1.5pt solid #0056b3; padding-bottom: 2pt; }
-      h2 { font-size: 12pt; border-bottom: 1pt solid #a0cffc; }
+      @page { margin: 1.5cm; mso-page-orientation: portrait; }
+      body { font-family: 'Arial', sans-serif; line-height: 1.15; color: #333; margin: 0; padding: 10px; background-color: #fff; font-size: 10.5pt; }
+      .container { max-width: 100%; margin: auto; background: #fff; padding: 10px; }
+      h1, h2, h3, h4 { color: #0056b3; margin-top: 12px; margin-bottom: 6px; border-bottom: 1px solid #eee; padding-bottom: 3px; }
+      h1 { font-size: 16pt; text-align: center; border-bottom: 2px solid #0056b3; padding-bottom: 6px; }
+      h2 { font-size: 13pt; border-bottom: 1px solid #a0cffc; }
       h3 { font-size: 11pt; color: #007bff; }
-      table { width: 100%; border-collapse: collapse; margin: 6pt 0; font-size: 10pt; }
-      table, th, td { border: 1pt solid #666; }
-      th, td { padding: 3pt 4pt; text-align: left; vertical-align: top; }
-      tr { page-break-inside: avoid; } /* Evita que las celdas se partan a la mitad de la hoja */
+      table { width: 100%; border-collapse: collapse; margin-top: 5px; margin-bottom: 10px; background-color: #fdfdfd; font-size: 10pt; }
+      table, th, td { border: 1px solid #ddd; }
+      th, td { padding: 4px 6px; text-align: left; vertical-align: top; }
+      tr { page-break-inside: avoid; }
       th { background-color: #e9f5ff; font-weight: bold; color: #004085; }
-      ul, ol { margin-top: 2pt; margin-bottom: 4pt; margin-left: 15pt; padding-left: 0; }
-      li { margin-bottom: 1pt; }
-      p { margin: 2pt 0; }
-      /* Fuerza la anulación de espacios automáticos de Word */
+      ul { list-style-type: disc; margin-left: 20px; padding-left: 0; margin-top: 3px; margin-bottom: 4px; }
+      ol { list-style-type: decimal; margin-left: 20px; padding-left: 0; margin-top: 3px; margin-bottom: 4px; }
+      li { margin-bottom: 2px; }
+      p { margin-top: 2px; margin-bottom: 6px; }
       p.MsoNormal, li.MsoNormal, div.MsoNormal { margin: 0; margin-bottom: .0001pt; }
+      .signature-line { margin-top: 30px; text-align: center; display: flex; justify-content: space-around; padding-top: 10px; }
+      .signature-line div { width: 30%; border-top: 1px solid #333; padding-top: 5px; font-size: 10pt; }
+      .matrix-table th, .matrix-table td { text-align: center; }
+      .matrix-table th:first-child, .matrix-table td:first-child { text-align: left; }
     </style>
   `;
 
-  const preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Documento</title>" + styles + "</head><body>";
-  const postHtml = "</body></html>";
+  const preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Documento</title>" + styles + "</head><body><div class='container'>";
+  const postHtml = "</div></body></html>";
   const html = preHtml + rawHTML + postHtml;
 
   const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
@@ -568,7 +559,7 @@ function exportToWord(elementId, filename) {
   document.body.removeChild(downloadLink);
 }
 
-// ====== LLAMADAS A TU API EN VERCEL ======
+// ====== LLAMADAS A TU API EN VERCEL (CONEXIÓN CON IA ORIGINAL) ======
 async function callIA(prompt, outputId, btnExportId) {
   const output = document.getElementById(outputId);
   const btnExport = document.getElementById(btnExportId);
@@ -596,7 +587,7 @@ async function callIA(prompt, outputId, btnExportId) {
   }
 }
 
-// Generación con coherencia de variables, CNEB y Vista Previa Completa Asegurada
+// Generación con coherencia de variables, CNEB, Vista Previa Completa y Firmas Automáticas
 async function generarSesionIA() {
   const titulo = document.getElementById('sesTitulo').value || "Tema Libre";
   const area = document.getElementById('sesArea').value;
@@ -611,7 +602,7 @@ async function generarSesionIA() {
   let templateText = await readFileWord('sesFile');
   let formatInstruccion = templateText ? `\n\nADAPTA TU RESPUESTA ESTRICTAMENTE A LOS TÍTULOS Y ESTRUCTURA DE ESTA PLANTILLA SUBIDA POR EL USUARIO:\n${templateText}` : "";
 
-  // Prompt ultra restrictivo sobre espacios y saltos de línea
+  // Prompt ultra restrictivo sobre espacios, saltos de línea y firmas
   const prompt = `Actúa como experto MINEDU Perú. Desarrolla una Sesión de Aprendizaje detallada y COMPLETA.
 Datos a utilizar OBLIGATORIAMENTE en tu respuesta:
 - Área Curricular: ${area}
@@ -621,11 +612,13 @@ Datos a utilizar OBLIGATORIAMENTE en tu respuesta:
 - Capacidades: ${capacidades}
 - Desempeño precisado: ${desempeño}
 
-REGLAS ESTRICTAS DE DISEÑO COMPACTO:
-1. Tu respuesta DEBE COMENZAR con una tabla de "Datos Informativos" y otra de "Propósitos de Aprendizaje" mostrando obligatoriamente el Área, Grado, Título, Competencia, Capacidades y Desempeño dados.
+REGLAS ESTRICTAS DE DISEÑO COMPACTO Y ESQUEMA:
+1. Tu respuesta DEBE COMENZAR con una tabla de "Datos Informativos" y otra de "Propósitos de Aprendizaje" mostrando obligatoriamente el Área, Grado, Título, Competencia, Capacidades y Desempeño dados. Esto es para generar una vista previa completa.
 2. Devuelve SOLO CÓDIGO HTML PURO estructurado (Sin \`\`\`html ni markdown).
 3. Utiliza Tablas HTML compactas (<table>, <tr>, <th>, <td>) para estructurar todo, incluida la Secuencia Didáctica.
 4. EVITA saltos de línea innecesarios (<br>) o párrafos vacíos (<p></p>). Sé muy compacto en la maquetación HTML para no generar hojas vacías al imprimir.
+5. Al final de la sesión, incluye SIEMPRE un bloque para firmas con esta estructura exacta en HTML: 
+<div class="signature-line"><div>DOCENTE</div><div>COORDINADOR</div><div>DIRECTOR(A)</div></div>
 ${formatInstruccion}`;
 
   await callIA(prompt, 'sesOutput', 'btnExportSes');
