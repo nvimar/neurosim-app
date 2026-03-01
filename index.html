@@ -90,15 +90,15 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 .cneb-tag{display:inline-block;background:var(--primary);color:#fff;border-radius:20px;padding:.15rem .6rem;font-size:.72rem;font-weight:600;margin:.15rem .1rem;cursor:pointer;transition:opacity .15s}
 .cneb-tag:hover{opacity:.8}
 
-/* Output - rendered HTML (Solo visualización en Web) */
-.output-rendered{background:#fff;border:1px solid #a7f3d0;border-radius:var(--radius);padding:1.5rem 2rem;margin-top:1rem;font-size:.9rem;line-height:1.6;max-height:600px;overflow-y:auto;scroll-behavior:smooth;}
+/* Output - rendered HTML (Solo visualización en Web) - VERSIÓN COMPACTADA */
+.output-rendered{background:#fff;border:1px solid #a7f3d0;border-radius:var(--radius);padding:1.5rem 2rem;margin-top:1rem;font-size:.9rem;line-height:1.2;max-height:600px;overflow-y:auto;scroll-behavior:smooth;}
 .output-rendered h2{color:var(--primary);font-size:1rem;font-weight:700;border-bottom:2px solid var(--secondary);padding-bottom:.3rem;margin:1.2rem 0 .5rem}
 .output-rendered table{width:100%;border-collapse:collapse;font-size:.82rem;margin:.5rem 0}
 .output-rendered th{background:var(--primary);color:#fff;padding:.5rem .7rem;text-align:left;font-weight:600}
-.output-rendered td{border:1px solid var(--border);padding:.5rem .7rem;vertical-align:top}
+.output-rendered td{border:1px solid var(--border);padding:0.2rem 0.4rem;vertical-align:top}
 .output-rendered tr:nth-child(even) td{background:#f8fffe}
-.output-rendered ul{padding-left:1.2rem;margin:.3rem 0}
-.output-rendered li{margin:.2rem 0}
+.output-rendered ul{padding-left:1rem;margin:0.1rem 0}
+.output-rendered li{margin:0}
 .output-rendered .signature-line {margin-top: 30px; text-align: center; display: flex; justify-content: space-around; padding-top: 20px;}
 .output-rendered .signature-line div {width: 30%; border-top: 1px solid #333; padding-top: 8px; font-size: 0.9em;}
 
@@ -347,6 +347,11 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 </div>
 
 <script>
+// =====================================================================
+// 🔑 CONFIGURACIÓN DE IA EN VERCEL
+// El sistema se conecta a tu API en Vercel para mayor seguridad.
+// =====================================================================
+
 // --- ÁREAS, COMPETENCIAS Y CAPACIDADES CNEB ---
 const areasCNEB = {
   "Comunicación": [
@@ -451,7 +456,7 @@ function onCompetenciaChange(prefix) {
   if (prefix === 'ses') updateDesempenoAutomatico();
 }
 
-// CAPACIDADES CON VIÑETA DE TEXTO (Para que jamás use <ul><li>)
+// NUEVA FUNCIÓN: Genera un desempeño modelo automáticamente
 function updateDesempenoAutomatico() {
   const compSelect = document.getElementById('sesCompetencia');
   if(!compSelect || compSelect.value === '') return;
@@ -466,6 +471,7 @@ function updateDesempenoAutomatico() {
   document.getElementById('sesDesempeno').value = `Identifica, explica y aplica estrategias clave relacionadas a la competencia '${competenciaName}', adaptando su proceso cognitivo a las exigencias de los estudiantes de ${grado}, evidenciando el análisis y comprensión de ${nivelComplejidad}.`;
 }
 
+// ====== LÓGICA PARA LEER WORD (.docx) ======
 function showFileName(input, labelId) {
   const label = document.getElementById(labelId);
   if (input.files && input.files.length > 0) {
@@ -492,57 +498,54 @@ async function readFileWord(inputId) {
   });
 }
 
-// ====== EXPORTACIÓN A WORD (CERO NIVELES, CERO SANGRÍAS) ======
+// ====== LÓGICA PARA EXPORTAR A WORD (VERSIÓN MEJORADA: SÚPER COMPACTA Y SIN ESPACIOS EXTRA) ======
 function exportToWord(elementId, filename) {
   const contentEl = document.getElementById(elementId).querySelector('.output-rendered');
   if (!contentEl) return alert("No hay documento generado para exportar.");
 
-  // LA MAGIA: Destruimos absolutamente todas las listas HTML y las volvemos texto plano con <br>
+  // Limpieza profunda: elimina todo el código basura y espacios innecesarios
   let rawHTML = contentEl.innerHTML
-      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '') 
+      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')           // quita estilos incrustados
       .replace(/```html/gi, '')
       .replace(/```css/gi, '')
       .replace(/```/g, '')
-      .replace(/<p[^>]*>/gi, '') 
-      .replace(/<\/p>/gi, '') 
-      .replace(/<ul[^>]*>/gi, '') // Destruye etiqueta UL
-      .replace(/<\/ul>/gi, '')
-      .replace(/<ol[^>]*>/gi, '') // Destruye etiqueta OL
-      .replace(/<\/ol>/gi, '')
-      .replace(/<li[^>]*>\s*/gi, '• ') // Convierte el inicio del LI en un punto literal (texto)
-      .replace(/\s*<\/li>/gi, '<br>') // Convierte el fin del LI en un salto de línea simple
-      .replace(/(<br\s*\/?>\s*)+<\/td>/gi, '</td>') 
-      .replace(/<td>\s*(<br\s*\/?>\s*)+/gi, '<td>') 
-      .replace(/(<br\s*\/?>[\s\n\r]*){2,}/gi, '<br>') 
-      .replace(/>\s+</g, '><') // Elimina TODO espacio en blanco fantasma del HTML
+      .replace(/<p>[\s\xA0\n\r]*<\/p>/gi, '')                  // párrafos vacíos
+      .replace(/<div>[\s\xA0\n\r]*<\/div>/gi, '')              // divs vacíos
+      .replace(/(<br\s*\/?>[\s\n\r]*){2,}/gi, '<br>')          // múltiples <br> se reducen a uno
+      .replace(/ margin-bottom: [^;]+;/gi, '')                 // elimina márgenes inline
+      .replace(/ margin-top: [^;]+;/gi, '')
+      .replace(/&nbsp;/g, ' ')                                  // espacios duros se convierten en normales
+      .replace(/\s+/g, ' ')                                     // colapsa múltiples espacios a uno
+      .replace(/>\s+</g, '><')                                  // elimina espacios entre etiquetas (no afecta contenido)
       .trim();
 
+  // CSS ultracompacto para Word (márgenes reducidos, fuente pequeña, padding mínimo)
   const styles = `
     <style>
-      @page { margin: 1cm; mso-page-orientation: portrait; }
-      body { font-family: 'Arial', sans-serif; line-height: 1.0; color: #000; margin: 0; padding: 0; font-size: 10pt; }
+      @page { margin: 0.5cm; mso-page-orientation: portrait; }
+      body { font-family: 'Arial', sans-serif; line-height: 1.0; color: #000; margin: 0; padding: 0; font-size: 8pt; }
       .container { max-width: 100%; margin: auto; }
-      h1, h2, h3, h4 { color: #0056b3; margin: 4pt 0 2pt 0; padding: 0; line-height: 1.0; }
-      h1 { font-size: 12pt; text-align: center; border-bottom: 1.5pt solid #0056b3; padding-bottom: 2pt; }
-      h2 { font-size: 11pt; border-bottom: 1px solid #a0cffc; background: #f8fbff; }
-      h3 { font-size: 10pt; color: #007bff; }
-      
-      /* TABLAS ESTRICTAS: Sin padding casi, abrazando al texto */
-      table { width: 100%; border-collapse: collapse; margin: 2pt 0 4pt 0; font-size: 9pt; mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+      h1, h2, h3, h4 { color: #0056b3; margin: 2pt 0 1pt 0; padding: 0; line-height: 1.0; }
+      h1 { font-size: 10pt; text-align: center; border-bottom: 1pt solid #0056b3; padding-bottom: 1pt; }
+      h2 { font-size: 9pt; border-bottom: 1px solid #a0cffc; background: #f8fbff; }
+      h3 { font-size: 8.5pt; color: #007bff; }
+      table { width: 100%; border-collapse: collapse; margin: 2pt 0 2pt 0; font-size: 7.5pt; }
       table, th, td { border: 1px solid #000; }
-      th, td { padding: 1px 2px; text-align: left; vertical-align: top; mso-line-height-rule: exactly; line-height: 1.0; }
+      th, td { padding: 1px 2px; text-align: left; vertical-align: top; }
       tr { page-break-inside: avoid; }
-      th { background-color: #e9f5ff; font-weight: bold; color: #004085; }
-      
-      /* ELIMINACIÓN DE SANGRÍAS POR DEFECTO */
-      p, div, span { margin: 0; mso-margin-top-alt: 0; mso-margin-bottom-alt: 0; mso-space-before: 0; mso-space-after: 0; }
-      
-      .signature-line { margin-top: 25px; text-align: center; display: flex; justify-content: space-around; width: 100%; }
-      .signature-line div { width: 30%; border-top: 1px solid #000; padding-top: 2px; font-size: 9pt; }
+      th { background-color: #e9f5ff; font-weight: bold; color: #000; }
+      ul, ol { margin-left: 8px; padding-left: 0; margin-top: 0; margin-bottom: 1pt; }
+      li { margin-bottom: 0; }
+      p { margin: 0 0 1pt 0; }
+      p.MsoNormal, li.MsoNormal, div.MsoNormal { margin: 0; margin-bottom: .0001pt; }
+      .signature-line { margin-top: 8px; text-align: center; display: flex; justify-content: space-around; width: 100%; }
+      .signature-line div { width: 30%; border-top: 1px solid #000; padding-top: 1px; font-size: 7.5pt; }
+      .matrix-table th, .matrix-table td { text-align: center; }
+      .matrix-table th:first-child, .matrix-table td:first-child { text-align: left; }
     </style>
   `;
 
-  const preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='[http://www.w3.org/TR/REC-html40](http://www.w3.org/TR/REC-html40)'><head><meta charset='utf-8'><title>Documento</title>" + styles + "</head><body><div class='container'>";
+  const preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Documento</title>" + styles + "</head><body><div class='container'>";
   const postHtml = "</div></body></html>";
   const html = preHtml + rawHTML + postHtml;
 
@@ -562,7 +565,7 @@ function exportToWord(elementId, filename) {
   document.body.removeChild(downloadLink);
 }
 
-// ====== LLAMADAS A VERCEL ======
+// ====== LLAMADAS A TU API EN VERCEL ======
 async function callIA(prompt, outputId, btnExportId) {
   const output = document.getElementById(outputId);
   const btnExport = document.getElementById(btnExportId);
@@ -579,11 +582,12 @@ async function callIA(prompt, outputId, btnExportId) {
     const data = await res.json();
     if (data.error) throw new Error(data.error);
     
+    // Limpieza de bloques de código en la visualización web
     let cleanResponse = data.respuesta
       .replace(/```html/gi, '')
       .replace(/```css/gi, '')
       .replace(/```/g, '')
-      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, ''); 
+      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, ''); // Remueve estilos IA de la web también
 
     output.innerHTML = `<div class="output-rendered">${cleanResponse}</div>`;
     btnExport.style.display = 'inline-flex'; 
@@ -594,7 +598,7 @@ async function callIA(prompt, outputId, btnExportId) {
   }
 }
 
-// ====== GENERACIÓN DE SESIÓN RESTRINGIDA ======
+// Generación de Sesión con Reglas Estrictas
 async function generarSesionIA() {
   const titulo = document.getElementById('sesTitulo').value || "Tema Libre";
   const area = document.getElementById('sesArea').value;
@@ -603,55 +607,31 @@ async function generarSesionIA() {
   const competencia = compSelect.options[compSelect.selectedIndex]?.text || "No especificada";
   const desempeño = document.getElementById('sesDesempeno').value || "No especificado";
   
-  // Transformamos las capacidades seleccionadas DIRECTO en texto con salto de línea (Sin UL ni LI)
   const capNodes = document.querySelectorAll('#sesCapacidades input:checked');
-  let capacidades = Array.from(capNodes).map(n => `• ${n.parentNode.textContent.trim()}`).join('<br>');
-  if(!capacidades) capacidades = "• No especificadas";
+  let capacidades = Array.from(capNodes).map(n => n.parentNode.textContent.trim()).join(', ') || "No especificadas";
 
   let templateText = await readFileWord('sesFile');
-  let formatInstruccion = templateText ? `Considera esta plantilla base: \n${templateText}` : "";
+  let formatInstruccion = templateText ? `\n\nADAPTA TU RESPUESTA ESTRICTAMENTE A LOS TÍTULOS Y ESTRUCTURA DE ESTA PLANTILLA SUBIDA POR EL USUARIO:\n${templateText}` : "";
 
-  // Prompt BLINDADO: Se le prohíbe a la IA usar listas HTML.
-  const prompt = `Actúa como experto MINEDU Perú. Desarrolla una Sesión de Aprendizaje.
-${formatInstruccion}
+  // Prompt con prohibición de usar <style> y orden de salto de página
+  const prompt = `Actúa como experto MINEDU Perú. Desarrolla una Sesión de Aprendizaje detallada y COMPLETA.
+Datos a utilizar OBLIGATORIAMENTE en tu respuesta:
+- Área Curricular: ${area}
+- Grado: ${grado}
+- Título de Sesión: ${titulo}
+- Competencia: ${competencia}
+- Capacidades: ${capacidades}
+- Desempeño precisado: ${desempeño}
 
-REGLA DE ORO: TIENES PROHIBIDO INVENTAR HTML O ETIQUETAS <style>.
-NO USES ETIQUETAS <ul>, <ol>, <li> NI <p>. Usa el símbolo "•" para viñetas y la etiqueta "<br>" para saltar de línea.
-
-Debes devolver EXACTAMENTE ESTA PLANTILLA HTML copiándola tal cual y rellenando la información requerida en su interior:
-
-<h2>1. Datos Informativos</h2>
-<table>
-  <tr><th>Área Curricular</th><td>${area}</td><th>Grado</th><td>${grado}</td></tr>
-  <tr><th>Título de la Sesión</th><td colspan="3">${titulo}</td></tr>
-</table>
-
-<h2>2. Propósitos de Aprendizaje</h2>
-<table>
-  <tr><th>Competencia</th><th>Capacidades</th><th>Desempeño Precisado</th></tr>
-  <tr><td><strong>${competencia}</strong></td><td>${capacidades}</td><td>${desempeño}</td></tr>
-</table>
-
-<h2>3. Secuencia Didáctica</h2>
-<table>
-  <tr><th style="width:15%">Momentos</th><th>Actividades / Estrategias (Usa el símbolo "•" para viñetas y <br> para separar. PROHIBIDO USAR <ul> O <li>)</th><th style="width:15%">Tiempo</th></tr>
-  <tr><td><strong>INICIO</strong></td><td>• [Aquí redacta estrategia 1]<br>• [Estrategia 2]</td><td>15 min</td></tr>
-  <tr><td><strong>DESARROLLO</strong></td><td>• [Aquí redacta estrategia 1]<br>• [Estrategia 2]</td><td>60 min</td></tr>
-  <tr><td><strong>CIERRE</strong></td><td>• [Aquí redacta estrategia 1]<br>• [Estrategia 2]</td><td>15 min</td></tr>
-</table>
-
+REGLAS ESTRICTAS DE DISEÑO COMPACTO Y ESQUEMA:
+1. NO INCLUYAS ETIQUETAS <style> NI CÓDIGO CSS. SOLO HTML PURO (<table>, <h2>, <p>, <ul>).
+2. Tu respuesta DEBE COMENZAR con una tabla de "Datos Informativos" y otra de "Propósitos de Aprendizaje" mostrando obligatoriamente el Área, Grado, Título, Competencia, Capacidades y Desempeño dados.
+3. Utiliza Tablas HTML compactas (<table>, <tr>, <th>, <td>) para estructurar toda la Secuencia Didáctica. Sé muy breve y directo usando viñetas.
+4. EVITA saltos de línea innecesarios (<br>) o párrafos vacíos (<p></p>). 
+5. MUY IMPORTANTE: La sección de Evaluación o Lista de Cotejo DEBE ir en una hoja aparte. Para lograrlo, escribe exactamente este código HTML: <br clear="all" style="page-break-before:always" /> justo antes de la etiqueta <h2>Evaluación</h2> o <h2>Lista de Cotejo</h2>.
+6. Al final de la sesión (antes del salto de página de la evaluación), incluye SIEMPRE un bloque para firmas con esta estructura exacta en HTML: 
 <div class="signature-line"><div>DOCENTE</div><div>COORDINADOR</div><div>DIRECTOR(A)</div></div>
-
-<br clear="all" style="page-break-before:always" />
-
-<h2>4. Lista de Cotejo</h2>
-<table>
-  <tr><th>Nº</th><th>Nombres y Apellidos</th><th>Criterio 1: [Define criterio]</th><th>Criterio 2: [Define criterio]</th><th>Observaciones</th></tr>
-  <tr><td>01</td><td></td><td></td><td></td><td></td></tr>
-  <tr><td>02</td><td></td><td></td><td></td><td></td></tr>
-  <tr><td>03</td><td></td><td></td><td></td><td></td></tr>
-  <tr><td>04</td><td></td><td></td><td></td><td></td></tr>
-</table>`;
+${formatInstruccion}`;
 
   await callIA(prompt, 'sesOutput', 'btnExportSes');
 }
@@ -660,24 +640,22 @@ async function generarUnidadIA() {
   const titulo = document.getElementById('uniTitulo').value || "Unidad Libre";
   const area = document.getElementById('uniArea').value;
   let templateText = await readFileWord('uniFile');
-  let formatInstruccion = templateText ? `\n\nADAPTA TU RESPUESTA A ESTA PLANTILLA:\n${templateText}` : "";
+  let formatInstruccion = templateText ? `\n\nADAPTA TU RESPUESTA ESTRICTAMENTE A LOS TÍTULOS Y ESTRUCTURA DE ESTA PLANTILLA:\n${templateText}` : "";
 
-  const prompt = `Actúa como experto MINEDU Perú. Crea una Unidad Didáctica. Tema: ${titulo}. Área: ${area}. 
-  DEVUELVE SOLO HTML PURO estructurado en Tablas. NO INCLUYAS ETIQUETAS <style>. NO USES <ul> NI <li>, usa viñetas "•" y <br>. ${formatInstruccion}`;
+  const prompt = `Actúa como experto MINEDU Perú. Desarrolla Unidad Didáctica. Tema: ${titulo}. Área: ${area}. Devuelve SOLO HTML puro sin <style> ni CSS. Usa Tablas HTML para los datos. Evita generar espacios en blanco, <br> excesivos o párrafos vacíos. ${formatInstruccion}`;
   await callIA(prompt, 'uniOutput', 'btnExportUni');
 }
 
 async function generarPlanAnualIA() {
   const area = document.getElementById('planArea').value;
   let templateText = await readFileWord('planFile');
-  let formatInstruccion = templateText ? `\n\nADAPTA TU RESPUESTA A ESTA PLANTILLA:\n${templateText}` : "";
+  let formatInstruccion = templateText ? `\n\nADAPTA TU RESPUESTA ESTRICTAMENTE A LOS TÍTULOS Y ESTRUCTURA DE ESTA PLANTILLA:\n${templateText}` : "";
 
-  const prompt = `Actúa como experto MINEDU Perú. Crea un Plan Anual para ${area}. 
-  DEVUELVE SOLO HTML PURO estructurado en Tablas. NO INCLUYAS ETIQUETAS <style>. NO USES <ul> NI <li>, usa viñetas "•" y <br>. ${formatInstruccion}`;
+  const prompt = `Actúa como experto MINEDU Perú. Desarrolla Plan Anual para ${area}. Devuelve SOLO HTML puro sin <style> ni CSS. Usa Tablas HTML para la organización. Evita generar espacios en blanco, <br> excesivos o párrafos vacíos. ${formatInstruccion}`;
   await callIA(prompt, 'planOutput', 'btnExportPlan');
 }
 
-// ====== CHAT ======
+// ====== LÓGICA DEL CHAT CON LA API EN VERCEL ======
 function scrollToBottomChat() {
   const container = document.getElementById('chatMessages');
   container.scrollTop = container.scrollHeight;
