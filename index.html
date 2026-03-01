@@ -144,7 +144,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
     <div class="auth-logo">N</div>
     <h1>Neurosim</h1>
     <p class="subtitle">Planificador de Clases – CNEB</p>
-    <p class="desc">Genera sesiones, unidades didácticas y planificación anual alineadas al Currículo Nacional de Educación Básica para secundaria.</p>
+    <p class="desc">Genera sesiones y unidades alineadas al Currículo Nacional con Inteligencia Artificial.</p>
     <div class="auth-card">
       <h2>🔐 Iniciar sesión</h2>
       <form id="loginForm" onsubmit="enterApp(event)">
@@ -186,7 +186,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 
   <div class="main">
     <div id="page-dashboard">
-      <h1>¡Bienvenido, <span id="welcomeName">Docente</span>! 👋</h1>
+      <h1>¡Bienvenido, Docente! 👋</h1>
       <p class="page-desc">Panel de planificación pedagógica – CNEB Secundaria</p>
       <div class="stats">
         <div class="stat-card"><div class="stat-icon">📄</div><div><div class="val" id="statDocs">0</div><div class="lbl">Documentos</div></div></div>
@@ -208,8 +208,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
         
         <div class="form-group">
           <label>Plantilla o Formato Base (Word)</label>
-          <div class="file-drop" 
-               onclick="document.getElementById('sesFile').click()">
+          <div class="file-drop" onclick="document.getElementById('sesFile').click()">
             📄 Haz clic para subir tu formato base (.docx) aquí.
             <input type="file" id="sesFile" accept=".docx" onchange="showFileName(this, 'sesFileName')">
           </div>
@@ -246,10 +245,14 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
           <div id="sesCnebCompetencias"></div>
         </div>
 
-        <div class="form-group"><label>Título de la sesión</label><input id="sesTitulo" placeholder="Ej: Analizamos textos..."></div>
+        <div class="form-group"><label>Título de la sesión</label><input id="sesTitulo" placeholder="Ej: Analizamos textos expositivos..."></div>
         <div class="form-group"><label>Competencia</label><select id="sesCompetencia" onchange="onCompetenciaChange('ses')"><option value="">-- Selecciona --</option></select></div>
         <div class="form-group"><label>Capacidades</label><div id="sesCapacidades" style="font-size:.85rem;color:var(--muted);">Selecciona un área y competencia</div></div>
-        <div class="form-group"><label>Desempeño precisado</label><textarea id="sesDesempeno" style="min-height:60px" placeholder="Escribe el desempeño aquí..."></textarea></div>
+        
+        <div class="form-group">
+          <label>Desempeño precisado (Generado automáticamente - Editable)</label>
+          <textarea id="sesDesempeno" style="min-height:60px" placeholder="El desempeño se autocompletará aquí al elegir Grado y Competencia..."></textarea>
+        </div>
         
         <div style="margin-top:1rem;display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
           <button class="btn btn-primary" onclick="generarSesionIA()" style="width:auto">✨ Generar Sesión con IA</button>
@@ -266,8 +269,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 
         <div class="form-group">
           <label>Plantilla o Formato Base (Word)</label>
-          <div class="file-drop" 
-               onclick="document.getElementById('uniFile').click()">
+          <div class="file-drop" onclick="document.getElementById('uniFile').click()">
             📄 Haz clic para subir tu formato base (.docx) aquí.
             <input type="file" id="uniFile" accept=".docx" onchange="showFileName(this, 'uniFileName')">
           </div>
@@ -306,8 +308,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 
         <div class="form-group">
           <label>Plantilla o Formato Base (Word)</label>
-          <div class="file-drop" 
-               onclick="document.getElementById('planFile').click()">
+          <div class="file-drop" onclick="document.getElementById('planFile').click()">
             📄 Haz clic para subir tu formato base (.docx) aquí.
             <input type="file" id="planFile" accept=".docx" onchange="showFileName(this, 'planFileName')">
           </div>
@@ -472,7 +473,6 @@ function updateDesempenoAutomatico() {
   document.getElementById('sesDesempeno').value = `Identifica, explica y aplica estrategias clave relacionadas a la competencia '${competenciaName}', adaptando su proceso cognitivo a las exigencias de los estudiantes de ${grado}, evidenciando el análisis y comprensión de ${nivelComplejidad}.`;
 }
 
-
 // ====== LÓGICA PARA LEER WORD (.docx) ======
 function showFileName(input, labelId) {
   const label = document.getElementById(labelId);
@@ -500,39 +500,55 @@ async function readFileWord(inputId) {
   });
 }
 
-// ====== LÓGICA PARA EXPORTAR A WORD (COMPACTO Y LIMPIO) ======
+// ====== LÓGICA PARA EXPORTAR A WORD (SÚPER COMPACTO Y LIMPIO) ======
 function exportToWord(elementId, filename) {
   const contentEl = document.getElementById(elementId).querySelector('.output-rendered');
   if (!contentEl) return alert("No hay documento generado para exportar.");
 
-  // Limpiar etiquetas "```html" y saltos de línea basura que la IA pueda generar
+  // Limpieza extremadamente agresiva de espacios, brs dobles y basura de la IA
   let rawHTML = contentEl.innerHTML
       .replace(/```html/gi, '')
       .replace(/```/g, '')
-      .replace(/<p><br><\/p>/g, '')
-      .replace(/<p>&nbsp;<\/p>/g, '')
-      .replace(/<br>\s*<br>/g, '<br>')
+      .replace(/<p>[\s\xA0\n\r]*<\/p>/gi, '') // Elimina párrafos vacíos
+      .replace(/<div>[\s\xA0\n\r]*<\/div>/gi, '') // Elimina divs vacíos
+      .replace(/(<br\s*\/?>[\s\n\r]*){2,}/gi, '<br>') // Convierte múltiples <br> en uno solo
+      .replace(/ margin-bottom: [^;]+;/gi, '') // Quita márgenes inline que pueda poner la IA
+      .replace(/ margin-top: [^;]+;/gi, '')
       .trim();
 
-  // Inyectar el CSS exacto para mantener la estructura compacta en Word (Ahorra hojas)
+  // Inyectar el CSS exacto para forzar a MS Word a ser compacto
   const styles = `
     <style>
-      body { font-family: 'Arial', sans-serif; line-height: 1.15; color: #000; margin: 0; padding: 10px; font-size: 11pt; }
-      h1, h2, h3, h4 { color: #0056b3; margin-top: 12px; margin-bottom: 6px; border-bottom: 1px solid #eee; padding-bottom: 3px; }
-      h1 { font-size: 16pt; text-align: center; border-bottom: 2px solid #0056b3; padding-bottom: 6px; }
-      h2 { font-size: 13pt; border-bottom: 1px solid #a0cffc; }
-      h3 { font-size: 12pt; color: #007bff; }
-      table { width: 100%; border-collapse: collapse; margin-top: 5px; margin-bottom: 10px; font-size: 10.5pt; }
-      table, th, td { border: 1px solid #666; }
-      th, td { padding: 4px 6px; text-align: left; vertical-align: top; }
+      @page {
+          margin: 1.5cm 1.5cm 1.5cm 1.5cm; /* Márgenes de hoja estrechos */
+          mso-page-orientation: portrait;
+      }
+      body { 
+          font-family: 'Arial', sans-serif; 
+          line-height: 1.0; /* Interlineado muy corto */
+          color: #000; 
+          margin: 0; 
+          padding: 0; 
+          font-size: 10.5pt; /* Tamaño óptimo para ahorrar espacio */
+      }
+      h1, h2, h3, h4 { color: #0056b3; margin: 8pt 0 4pt 0; padding: 0; line-height: 1.2; }
+      h1 { font-size: 14pt; text-align: center; border-bottom: 1.5pt solid #0056b3; padding-bottom: 2pt; }
+      h2 { font-size: 12pt; border-bottom: 1pt solid #a0cffc; }
+      h3 { font-size: 11pt; color: #007bff; }
+      table { width: 100%; border-collapse: collapse; margin: 6pt 0; font-size: 10pt; }
+      table, th, td { border: 1pt solid #666; }
+      th, td { padding: 3pt 4pt; text-align: left; vertical-align: top; }
+      tr { page-break-inside: avoid; } /* Evita que las celdas se partan a la mitad de la hoja */
       th { background-color: #e9f5ff; font-weight: bold; color: #004085; }
-      ul, ol { margin-left: 20px; padding-left: 0; margin-top: 3px; margin-bottom: 8px; }
-      li { margin-bottom: 2px; }
-      p { margin-top: 2px; margin-bottom: 6px; }
+      ul, ol { margin-top: 2pt; margin-bottom: 4pt; margin-left: 15pt; padding-left: 0; }
+      li { margin-bottom: 1pt; }
+      p { margin: 2pt 0; }
+      /* Fuerza la anulación de espacios automáticos de Word */
+      p.MsoNormal, li.MsoNormal, div.MsoNormal { margin: 0; margin-bottom: .0001pt; }
     </style>
   `;
 
-  const preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='[http://www.w3.org/TR/REC-html40](http://www.w3.org/TR/REC-html40)'><head><meta charset='utf-8'><title>Documento</title>" + styles + "</head><body>";
+  const preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Documento</title>" + styles + "</head><body>";
   const postHtml = "</body></html>";
   const html = preHtml + rawHTML + postHtml;
 
@@ -552,7 +568,7 @@ function exportToWord(elementId, filename) {
   document.body.removeChild(downloadLink);
 }
 
-// ====== LLAMADAS A TU API EN VERCEL (CONEXIÓN CON IA ORIGINAL RESTAURADA) ======
+// ====== LLAMADAS A TU API EN VERCEL ======
 async function callIA(prompt, outputId, btnExportId) {
   const output = document.getElementById(outputId);
   const btnExport = document.getElementById(btnExportId);
@@ -589,14 +605,13 @@ async function generarSesionIA() {
   const competencia = compSelect.options[compSelect.selectedIndex]?.text || "No especificada";
   const desempeño = document.getElementById('sesDesempeno').value || "No especificado";
   
-  // Capturar capacidades marcadas
   const capNodes = document.querySelectorAll('#sesCapacidades input:checked');
   let capacidades = Array.from(capNodes).map(n => n.parentNode.textContent.trim()).join(', ') || "No especificadas";
 
   let templateText = await readFileWord('sesFile');
   let formatInstruccion = templateText ? `\n\nADAPTA TU RESPUESTA ESTRICTAMENTE A LOS TÍTULOS Y ESTRUCTURA DE ESTA PLANTILLA SUBIDA POR EL USUARIO:\n${templateText}` : "";
 
-  // Prompt modificado para asegurar vista previa en el navegador y Word
+  // Prompt ultra restrictivo sobre espacios y saltos de línea
   const prompt = `Actúa como experto MINEDU Perú. Desarrolla una Sesión de Aprendizaje detallada y COMPLETA.
 Datos a utilizar OBLIGATORIAMENTE en tu respuesta:
 - Área Curricular: ${area}
@@ -606,11 +621,11 @@ Datos a utilizar OBLIGATORIAMENTE en tu respuesta:
 - Capacidades: ${capacidades}
 - Desempeño precisado: ${desempeño}
 
-REGLAS ESTRICTAS:
-1. Tu respuesta DEBE COMENZAR con una tabla de "Datos Informativos" y "Propósitos de Aprendizaje" mostrando obligatoriamente el Área, Grado, Título, Competencia, Capacidades y Desempeño que te he proporcionado arriba, para que el usuario tenga una vista previa completa de sus datos.
-2. Mantén estricta coherencia pedagógica entre la competencia, capacidades, desempeño y el tema según el CNEB.
-3. Devuelve SOLO CÓDIGO HTML PURO estructurado. NO incluyas bloques \`\`\`html ni markdown en tu texto.
-4. Utiliza Tablas HTML (<table>, <tr>, <th>, <td>) para los "Datos Informativos", así como para estructurar la Secuencia Didáctica (Inicio, Desarrollo, Cierre detallados con tiempos) y la Evaluación.
+REGLAS ESTRICTAS DE DISEÑO COMPACTO:
+1. Tu respuesta DEBE COMENZAR con una tabla de "Datos Informativos" y otra de "Propósitos de Aprendizaje" mostrando obligatoriamente el Área, Grado, Título, Competencia, Capacidades y Desempeño dados.
+2. Devuelve SOLO CÓDIGO HTML PURO estructurado (Sin \`\`\`html ni markdown).
+3. Utiliza Tablas HTML compactas (<table>, <tr>, <th>, <td>) para estructurar todo, incluida la Secuencia Didáctica.
+4. EVITA saltos de línea innecesarios (<br>) o párrafos vacíos (<p></p>). Sé muy compacto en la maquetación HTML para no generar hojas vacías al imprimir.
 ${formatInstruccion}`;
 
   await callIA(prompt, 'sesOutput', 'btnExportSes');
@@ -622,7 +637,7 @@ async function generarUnidadIA() {
   let templateText = await readFileWord('uniFile');
   let formatInstruccion = templateText ? `\n\nADAPTA TU RESPUESTA ESTRICTAMENTE A LOS TÍTULOS Y ESTRUCTURA DE ESTA PLANTILLA:\n${templateText}` : "";
 
-  const prompt = `Actúa como experto MINEDU Perú. Desarrolla Unidad Didáctica. Tema: ${titulo}. Área: ${area}. Devuelve SOLO HTML puro sin markdown (sin \`\`\`html). Usa Tablas HTML para los datos. ${formatInstruccion}`;
+  const prompt = `Actúa como experto MINEDU Perú. Desarrolla Unidad Didáctica. Tema: ${titulo}. Área: ${area}. Devuelve SOLO HTML puro sin markdown (sin \`\`\`html). Usa Tablas HTML para los datos. Evita generar espacios en blanco, <br> excesivos o párrafos vacíos. ${formatInstruccion}`;
   await callIA(prompt, 'uniOutput', 'btnExportUni');
 }
 
@@ -631,7 +646,7 @@ async function generarPlanAnualIA() {
   let templateText = await readFileWord('planFile');
   let formatInstruccion = templateText ? `\n\nADAPTA TU RESPUESTA ESTRICTAMENTE A LOS TÍTULOS Y ESTRUCTURA DE ESTA PLANTILLA:\n${templateText}` : "";
 
-  const prompt = `Actúa como experto MINEDU Perú. Desarrolla Plan Anual para ${area}. Devuelve SOLO HTML puro sin markdown (sin \`\`\`html). Usa Tablas HTML para la organización. ${formatInstruccion}`;
+  const prompt = `Actúa como experto MINEDU Perú. Desarrolla Plan Anual para ${area}. Devuelve SOLO HTML puro sin markdown (sin \`\`\`html). Usa Tablas HTML para la organización. Evita generar espacios en blanco, <br> excesivos o párrafos vacíos. ${formatInstruccion}`;
   await callIA(prompt, 'planOutput', 'btnExportPlan');
 }
 
